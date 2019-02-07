@@ -1,5 +1,5 @@
 # Lattice Monitoring Framework
-This project contains both the source code and some pre-compiled binaries of the Lattice Monitoring Framework.
+This project contains both the source code of the Lattice Monitoring Framework.
 
 The main components of the framework are:
 - The Controller
@@ -7,28 +7,29 @@ The main components of the framework are:
 - Data Consumers
 
 
-In general, we can assume that a single Controller instance is up and running in a given resource technological domain. However, alternative monitoring topologies might be used.
-
 ### Build
 The provided `build.xml` (under `source/`) can be used both for compiling the source code and generating the deployable jar files.
+
 ```sh
 $ cd source/
 $ ant dist
 ```
-The above command generates two different jar binary files in the jars directory:
+
+The above command generates three different jar binary files in the jars directory:
 - `monitoring-bin-controller.jar` containing all the classes and dependencies related to the controller.
 - `monitoring-bin-core.jar` containing a subset of classes and dependencies that can be used for instantiating Data Sources and Data Consumers.
+- `monitoring-bin-all.jar` containing the whole set of classes and dependencies.
 
 and also a jar containing the source code
 - `monitoring-src.jar`
 
 ### Installation
-As soon as the Build process is completed, the controller can be started as follows:
+As soon as the Build process is completed, a controller instance (e.g, ZMQController) can be started as follows:
 ```sh
 $ cd jars/
-$ java -cp monitoring-bin-controller.jar eu.fivegex.monitoring.control.controller.Controller controller.properties
+$ java -cp monitoring-bin-controller.jar mon.lattice.control.controller.json.ZMQController controller.properties
 ```
-The `controller.properties` file contains the configuration settings for the controller (an example is reported under `conf/`)
+The `controller.properties` file contains the configuration settings for the controller (example files are under `conf/`)
 
 ### Configuration
 ```
@@ -39,7 +40,7 @@ is the local port used by the Controller when connecting to the Information Plan
 ```
 restconsole.localport = 6666
 ```
-is the port where the controller will listen for HTTP control requests coming from the orchestration layer (i.e., IMoS).
+is the port where the controller will listen for HTTP control requests.
 ```
 probes.package = eu.fivegex.appl.probes
 probes.suffix = Probe
@@ -63,11 +64,3 @@ The above settings allow to specify (in order):
 - the path where the jar will be copied on the remote machine where the Data Source is being deployed
 - the class name of the Data Source to be started (it must exist in the specified jar)
 - the class name of the Data Consumer to be started (it must exist in the specified jar)
-
-
-### Testing
-In order to verify that the Controller is up and running, a quick check consists in performing a `GET` request to `/probe/catalogue/`. The expected result is a response code `200` and `Content-Type: application/json`.
-
-
-### Usage for the vCDN experiment
-Lattice is the monitoring backend that will enable collecting measurements from the VNFs deployed via the 5GEx Orchestration System. It can be used e.g., to retrieve measurements from Docker containers and / or Openstack VMs. When Lattice is used with Docker, the system running the Docker Engine has to be configured to expose the REST API on port 4243 (see [Docker documentation](https://success.docker.com/article/how-do-i-enable-the-remote-api-for-dockerd)).
