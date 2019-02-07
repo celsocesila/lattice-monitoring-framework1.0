@@ -5,7 +5,7 @@
 
 package mon.lattice.appl.demo;
 
-import mon.lattice.im.dht.DHTInfoPlaneRoot;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTRootInfoPlane;
 import mon.lattice.distribution.multicast.MulticastDataPlaneConsumerWithNames;
 import mon.lattice.distribution.multicast.MulticastAddress;
 import mon.lattice.appl.dataconsumers.BasicConsumer;
@@ -37,7 +37,7 @@ public class SMStub2 {
 	consumer.setDataPlane(new MulticastDataPlaneConsumerWithNames(address));
 
 	// set up info plane
-	consumer.setInfoPlane(new DHTInfoPlaneRoot("localhost", dhtPort));
+	consumer.setInfoPlane(new TomP2PDHTRootInfoPlane("localhost", dhtPort));
 
 	// set up reporting of messages
 	consumer.setReporter(new MeasurementPrinter(consumer.getInfoPlane()));

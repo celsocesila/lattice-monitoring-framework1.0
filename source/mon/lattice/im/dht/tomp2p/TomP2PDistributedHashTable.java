@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * of the distributed nodes.
  */
 
-public class DistributedHashTable implements ObjectDataReply {
+public class TomP2PDistributedHashTable implements ObjectDataReply {
     Peer peer; 
 
     PeerAddress rootPeer;
@@ -36,13 +36,13 @@ public class DistributedHashTable implements ObjectDataReply {
     
     AnnounceEventListener listener;
     
-    static Logger LOGGER = LoggerFactory.getLogger(DistributedHashTable.class);
+    static Logger LOGGER = LoggerFactory.getLogger(TomP2PDistributedHashTable.class);
 
     /**
      * Constructor a Peer on a specified localPort
      */
     
-    public DistributedHashTable(int port)  throws IOException {
+    public TomP2PDistributedHashTable(int port)  throws IOException {
 	this.localPort = port;
         
         peer = new PeerMaker(new Number160(new Random())).setPorts(port)
@@ -50,7 +50,7 @@ public class DistributedHashTable implements ObjectDataReply {
     }
     
     
-    public DistributedHashTable(int UDPPort, int TCPPort, InetAddress localAddress)  throws IOException {
+    public TomP2PDistributedHashTable(int UDPPort, int TCPPort, InetAddress localAddress)  throws IOException {
 	this.localUDPPort = UDPPort;
         this.localTCPPort = TCPPort;
 
@@ -64,7 +64,7 @@ public class DistributedHashTable implements ObjectDataReply {
     }
     
     
-    public DistributedHashTable(int port, InetAddress localAddress)  throws IOException {
+    public TomP2PDistributedHashTable(int port, InetAddress localAddress)  throws IOException {
 	this.localPort = port;
 
         Bindings binding = new Bindings();
@@ -168,7 +168,7 @@ public class DistributedHashTable implements ObjectDataReply {
      * Put an object into the DHT.
      */
     
-    public DistributedHashTable put(String aKey, Serializable aValue) throws IOException {
+    public TomP2PDistributedHashTable put(String aKey, Serializable aValue) throws IOException {
         Number160 keyHash = Number160.createHash(aKey);
         peer.put(keyHash).setData(new Data(aValue)).start().awaitUninterruptibly();
 	return this;
@@ -195,7 +195,7 @@ public class DistributedHashTable implements ObjectDataReply {
     /**
      * Removes the mapping with the specified key.
      */
-    public DistributedHashTable remove(String aKey) throws IOException {
+    public TomP2PDistributedHashTable remove(String aKey) throws IOException {
 	Number160 keyHash = Number160.createHash(aKey);
         peer.remove(keyHash).start();
 	return this;

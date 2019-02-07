@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractZMQInfoPlane implements InfoPlane  {
     
     ZMQSubscriber zmqSubscriber;
+    
     ZMQPublisher zmqPublisher;
     
     static Logger LOGGER = LoggerFactory.getLogger(AbstractZMQInfoPlane.class);
@@ -22,12 +23,12 @@ public abstract class AbstractZMQInfoPlane implements InfoPlane  {
     
     @Override
     public boolean containsDataSource(ID dataSourceID, int timeout) {
-        return zmqSubscriber.containsDataSource(dataSourceID); 
+        return zmqSubscriber.containsDataSource(dataSourceID, timeout); 
     }
     
     @Override
     public boolean containsDataConsumer(ID dataConsumerID, int timeout) {
-        return zmqSubscriber.containsDataConsumer(dataConsumerID);
+        return zmqSubscriber.containsDataConsumer(dataConsumerID, timeout);
     }
     
     @Override

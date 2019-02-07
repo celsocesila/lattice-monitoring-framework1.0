@@ -19,7 +19,7 @@ import mon.lattice.core.DataConsumerInteracter;
 import mon.lattice.core.ID;
 import mon.lattice.core.plane.ControlPlane;
 import mon.lattice.core.plane.InfoPlane;
-import mon.lattice.im.dht.DHTDataConsumerInfoPlane;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTDataConsumerInfoPlane;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -114,8 +114,8 @@ public final class ZMQControllableDataConsumerWithConnectDaemon extends Thread {
         consumer.setDataPlane(new ZMQDataPlaneConsumer(remoteDataHost, dataPort));
         //consumer.setDataPlane(new ZMQDataPlaneConsumerAndForwarder(dataPort));
        
-        //InfoPlane infoPlane = new DHTDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort);
-        //InfoPlane infoPlane = new DHTDataConsumerInfoPlane(remoteInfoPort, localInfoPort); // announcing to broadcast
+        //InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort);
+        //InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(remoteInfoPort, localInfoPort); // announcing to broadcast
         
         InfoPlane infoPlane = new ZMQDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort);
         

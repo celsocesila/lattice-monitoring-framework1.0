@@ -15,7 +15,7 @@ import mon.lattice.core.DataConsumerInteracter;
 import mon.lattice.core.plane.ControlPlane;
 import mon.lattice.core.plane.InfoPlane;
 import mon.lattice.distribution.udp.UDPDataPlaneConsumerWithNames;
-import mon.lattice.im.dht.DHTDataConsumerInfoPlane;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTDataConsumerInfoPlane;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -59,8 +59,8 @@ public final class SimpleControllableDataConsumer extends Thread {
         ((DataConsumerInteracter) controlPlane).setDataConsumer(consumer);
         consumer.setControlPlane(controlPlane);
         
-        //InfoPlane infoPlane = new DHTDataConsumerInfoPlane(infoPlaneRootName, infoPlaneRootPort, infoPlaneLocalPort);
-        InfoPlane infoPlane = new DHTDataConsumerInfoPlane(infoPlaneRootPort, infoPlaneLocalPort);
+        //InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(infoPlaneRootName, infoPlaneRootPort, infoPlaneLocalPort);
+        InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(infoPlaneRootPort, infoPlaneLocalPort);
         ((DataConsumerInteracter) infoPlane).setDataConsumer(consumer);
         consumer.setInfoPlane(infoPlane);
 

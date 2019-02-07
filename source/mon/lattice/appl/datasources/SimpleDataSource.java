@@ -10,7 +10,7 @@ import mon.lattice.control.udp.UDPDataSourceControlPlaneXDRConsumer;
 import mon.lattice.core.ControllableDataSource;
 import mon.lattice.core.plane.ControlPlane;
 import mon.lattice.distribution.udp.UDPDataPlaneProducerWithNames;
-import mon.lattice.im.dht.DHTDataSourceInfoPlane;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTDataSourceInfoPlane;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -65,7 +65,7 @@ public class SimpleDataSource {
         ds.setControlPlane(controlPlane);
         
         //the root of the DHT is by default on infoPlaneRootName 6699
-        ds.setInfoPlane(new DHTDataSourceInfoPlane(infoPlaneRootName, infoPlaneRootPort, infoPlaneLocalPort));
+        ds.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(infoPlaneRootName, infoPlaneRootPort, infoPlaneLocalPort));
         
 	ds.connect();        
     }

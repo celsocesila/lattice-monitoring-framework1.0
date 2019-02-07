@@ -15,31 +15,11 @@ import mon.lattice.im.delegate.InfoPlaneDelegate;
  * @author uceeftu
  * @param <ReturnType>
  */
-public abstract class AbstractController<ReturnType> extends AbstractPlaneInteracter implements ControlInterface<ReturnType>  {           
-    protected InfoPlaneDelegate controlInformationManager;
-   
-    protected int controlLocalPort;
-    protected int transmitterPoolSize;
-    protected int infoPlanePort; 
+public abstract class AbstractController<ReturnType> extends AbstractPlaneInteracter implements ControlInterface<ReturnType>  {        
     
+    protected InfoPlaneDelegate controlInformationManager;    
     protected Properties pr;
   
-//    protected String probesPackage; 
-//    protected String probesSuffix;
-//    
-//    protected String localJarPath;
-//    protected String jarFileName;
-//    protected String remoteJarPath;
-//    
-//    protected EntityDeploymentDelegate deploymentManager;
-//    protected Boolean usingDeploymentManager;
-//    
-//    protected String dsClassName;
-//    protected String dcClassName;
-//    
-//    protected JSONProbeCatalogue probeCatalogue;
-
-    
     abstract public void initPlanes(); 
         
     

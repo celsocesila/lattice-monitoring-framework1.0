@@ -5,7 +5,6 @@ import org.simpleframework.http.Response;
 
 import cc.clayman.console.ManagementConsole;
 import mon.lattice.control.ControlInterface;
-import us.monoid.json.JSONException;
 import us.monoid.json.JSONObject;
 
 /**

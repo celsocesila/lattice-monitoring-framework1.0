@@ -6,7 +6,6 @@
 package mon.lattice.control.console;
 
 import cc.clayman.console.BasicRequestHandler;
-import eu.fivegex.monitoring.control.probescatalogue.ProbesCatalogue;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -19,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.monoid.json.JSONException;
 import us.monoid.json.JSONObject;
+import eu.fivegex.monitoring.control.probescatalogue.JSONProbesCatalogue;
 
 /**
  *
@@ -27,7 +27,7 @@ import us.monoid.json.JSONObject;
 class ProbeRestHandler extends BasicRequestHandler {
     
     AbstractJSONRestController controllerInstance;
-    ProbesCatalogue<JSONObject, JSONException> controllerProbesCatalogueInterface;
+    JSONProbesCatalogue controllerProbesCatalogueInterface;
     
     private Logger LOGGER = LoggerFactory.getLogger(ProbeRestHandler.class);
     
@@ -40,8 +40,8 @@ class ProbeRestHandler extends BasicRequestHandler {
         controllerInstance = (AbstractJSONRestController) getManagementConsole().getAssociated();
         
         
-        if (controllerInstance instanceof ProbesCatalogue)
-            controllerProbesCatalogueInterface = (ProbesCatalogue<JSONObject, JSONException>) getManagementConsole().getAssociated();
+        if (controllerInstance instanceof JSONProbesCatalogue)
+            controllerProbesCatalogueInterface = (JSONProbesCatalogue) getManagementConsole().getAssociated();
         
         LOGGER.debug("-------- REQUEST RECEIVED --------\n" + request.getMethod() + " " +  request.getTarget());
         

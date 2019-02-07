@@ -5,6 +5,7 @@
  */
 package mon.lattice.im.delegate;
 
+import java.io.IOException;
 import mon.lattice.core.ID;
 import mon.lattice.core.plane.AbstractAnnounceMessage;
 import mon.lattice.core.EntityType;
@@ -112,7 +113,10 @@ public class ControlInformationManager implements InfoPlaneDelegate {
                 }
                 dataSourceInfo.put("id", id.toString());
                 dataSourceInfo.put("info", dsAddr);
-            } catch (DSNotFoundException ex) {
+            } catch (IOException ioex) {
+                throw new JSONException(ioex);
+            }
+              catch (DSNotFoundException ex) {
                 LOGGER.error(ex.getMessage());
                 deleteDataSource(id);
               }
@@ -137,7 +141,10 @@ public class ControlInformationManager implements InfoPlaneDelegate {
                 }
                 dataConsumerInfo.put("id", id.toString());
                 dataConsumerInfo.put("info", dcAddr);
-            } catch (DCNotFoundException ex) {
+            } catch (IOException ioex) {
+                throw new JSONException(ioex);
+              }
+              catch (DCNotFoundException ex) {
                 LOGGER.error(ex.getMessage());
                 deleteDataConsumer(id);
               }
@@ -149,7 +156,7 @@ public class ControlInformationManager implements InfoPlaneDelegate {
     
     
     @Override
-    public ControlEndPointMetaData getDSAddressFromProbeID(ID probe) throws ProbeNotFoundException, DSNotFoundException {
+    public ControlEndPointMetaData getDSAddressFromProbeID(ID probe) throws ProbeNotFoundException, DSNotFoundException, IOException {
         String dsID = (String)info.lookupProbeInfo(probe, "datasource");
         
         if (dsID != null) {
@@ -171,38 +178,11 @@ public class ControlInformationManager implements InfoPlaneDelegate {
     }
     
     @Override
-    public ControlEndPointMetaData getDSAddressFromID(ID dataSource) throws DSNotFoundException {
+    public ControlEndPointMetaData getDSAddressFromID(ID dataSource) throws DSNotFoundException, IOException {
         if (!containsDataSource(dataSource))
             throw new DSNotFoundException("Data Source with ID " + dataSource.toString() + " was not found in the infoplane");
         
-        JSONObject controlEndPoint;
-        Object lookupDataSourceInfo = info.lookupDataSourceInfo(dataSource, "controlendpoint");
-        
-        try {
-            if (lookupDataSourceInfo instanceof String) 
-                controlEndPoint = new JSONObject((String) lookupDataSourceInfo);
-            
-            else
-                controlEndPoint = (JSONObject)info.lookupDataSourceInfo(dataSource, "controlendpoint");
-       
-            LOGGER.debug(controlEndPoint.toString());
-            
-            ControlEndPointMetaData dsAddress = null;
-            if (controlEndPoint.getString("type").equals("socket")) {
-                dsAddress = new SocketControlEndPointMetaData(controlEndPoint.getString("type"),
-                                                        InetAddress.getByName(controlEndPoint.getString("address")),
-                                                        controlEndPoint.getInt("port")
-                                                       );
-            }
-            
-            else if (controlEndPoint.getString("type").equals("zmq")) {
-                dsAddress = new ZMQControlEndPointMetaData(controlEndPoint.getString("type"), dataSource);
-            }
-            return dsAddress;
-        } 
-        catch(Exception e) {
-            throw new DSNotFoundException("error while retrieving controlEndPoint for Data Source with ID " + dataSource.toString() + e.getMessage());
-        }
+        return this.fetchDataSourceControlEndPoint(dataSource);
         
     }
         
@@ -220,43 +200,15 @@ public class ControlInformationManager implements InfoPlaneDelegate {
         }  
     
     @Override
-    public ControlEndPointMetaData getDCAddressFromID(ID dataConsumer) throws DCNotFoundException {
+    public ControlEndPointMetaData getDCAddressFromID(ID dataConsumer) throws DCNotFoundException, IOException {
         if (!containsDataConsumer(dataConsumer))
             throw new DCNotFoundException("Data Consumer with ID " + dataConsumer.toString() + " was not found in the infoplane");
         
-        JSONObject controlEndPoint;
-        Object lookupDataConsumerInfo = info.lookupDataConsumerInfo(dataConsumer, "controlendpoint");
-        
-        try {
-            if (lookupDataConsumerInfo instanceof String)
-                controlEndPoint = new JSONObject((String)lookupDataConsumerInfo);
-        
-            else
-                controlEndPoint = (JSONObject)info.lookupDataConsumerInfo(dataConsumer, "controlendpoint");
-            
-            LOGGER.debug(controlEndPoint.toString());
-                        
-            ControlEndPointMetaData dcAddress = null;
-            if (controlEndPoint.getString("type").equals("socket")) {
-                dcAddress = new SocketControlEndPointMetaData(controlEndPoint.getString("type"),
-                                                        InetAddress.getByName(controlEndPoint.getString("address")),
-                                                        controlEndPoint.getInt("port")
-                                                       );
-            }
-            
-            else if (controlEndPoint.getString("type").equals("zmq")) {
-                dcAddress = new ZMQControlEndPointMetaData(controlEndPoint.getString("type"), dataConsumer);
-            }
-
-            return dcAddress;
-        } 
-        catch(Exception e) {
-            throw new DCNotFoundException("error while retrieving controlEndPoint for Data Consumer with ID " + dataConsumer.toString() + e.getMessage());
-        }    
+        return this.fetchDataConsumerControlEndPoint(dataConsumer);    
     }
     
     @Override
-    public ControlEndPointMetaData getDCAddressFromReporterID(ID reporter) throws ReporterNotFoundException, DCNotFoundException {
+    public ControlEndPointMetaData getDCAddressFromReporterID(ID reporter) throws ReporterNotFoundException, DCNotFoundException, IOException {
         String dcID = (String)info.lookupReporterInfo(reporter, "dataconsumer");
         
         if (dcID != null) {
@@ -347,6 +299,82 @@ public class ControlInformationManager implements InfoPlaneDelegate {
             return dataConsumers;
         }
     }
+    
+    
+    private ControlEndPointMetaData fetchDataSourceControlEndPoint(ID dataSourceID) throws IOException {        
+        Object rawControlEndPointInfo = info.lookupDataSourceInfo(dataSourceID, "controlEndPoint");
+        return parseControlEndPointInfo(rawControlEndPointInfo, dataSourceID);
+    }
+    
+    
+    private ControlEndPointMetaData fetchDataConsumerControlEndPoint(ID dataConsumerID) throws IOException {
+        Object rawControlEndPointInfo = info.lookupDataConsumerInfo(dataConsumerID, "controlEndPoint");
+        return parseControlEndPointInfo(rawControlEndPointInfo, dataConsumerID);
+    }
+         
+     
+    private ControlEndPointMetaData parseControlEndPointInfo(Object rawControlEndPointInfo, ID entityID) throws IOException {
+        JSONObject controlEndPointInfo;
+        
+        try {
+            if (rawControlEndPointInfo instanceof String) { 
+                controlEndPointInfo = new JSONObject();
+                
+                //example -> type:zmq;address:localhost;port:2233
+                String[] controlEndPointFields = ((String) rawControlEndPointInfo).split(";");
+                
+                String[] type;
+                String[] address;
+                String[] port;
+                
+                switch (controlEndPointFields.length) {
+                    case 1:
+                        type = controlEndPointFields[0].split(":");
+                        controlEndPointInfo.put(type[0], type[1]);
+                        break;
+                    case 3:
+                        type = controlEndPointFields[0].split(":");
+                        controlEndPointInfo.put(type[0], type[1]);
+                        
+                        address = controlEndPointFields[1].split(":");
+                        controlEndPointInfo.put(address[0], address[1]);
+                            
+                        port = controlEndPointFields[2].split(":");
+                        controlEndPointInfo.put(port[0], port[1]);
+                        break;
+                    default:
+                        //throw error
+                        break;
+                }
+                
+            }
+            
+            else
+                controlEndPointInfo = (JSONObject)rawControlEndPointInfo;
+       
+            LOGGER.debug(controlEndPointInfo.toString());
+            
+            ControlEndPointMetaData controlEndPointMetaData = null;
+            if (controlEndPointInfo.getString("type").equals("socket")) {
+                controlEndPointMetaData = new SocketControlEndPointMetaData(controlEndPointInfo.getString("type"),
+                                                        InetAddress.getByName(controlEndPointInfo.getString("address")),
+                                                        Integer.valueOf(controlEndPointInfo.getString("port"))
+                                                       );
+            }
+            
+            else if (controlEndPointInfo.getString("type").equals("zmq")) {
+                controlEndPointMetaData = new ZMQControlEndPointMetaData(controlEndPointInfo.getString("type"), entityID);
+            }
+            
+            return controlEndPointMetaData;
+        }
+        
+        catch(Exception e) {
+            throw new IOException("error while parsing controlEndPoint information: " + e.getMessage());
+        }
+        
+    } 
+     
     
     
     void addAnnouncedEntity(ID id, EntityType type) {

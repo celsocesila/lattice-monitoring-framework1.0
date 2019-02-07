@@ -11,15 +11,11 @@ package mon.lattice.appl.dataconsumers;
  */
 
 import mon.lattice.control.udp.UDPDataConsumerControlPlaneXDRConsumer;
-import mon.lattice.control.zmq.ZMQDataConsumerControlPlaneXDRConsumer;
-import mon.lattice.distribution.zmq.ZMQDataPlaneConsumer;
-import mon.lattice.distribution.zmq.ZMQDataPlaneConsumerAndForwarder;
-import mon.lattice.im.zmq.ZMQDataConsumerInfoPlane;
 import mon.lattice.core.DataConsumerInteracter;
 import mon.lattice.core.ID;
 import mon.lattice.core.plane.ControlPlane;
 import mon.lattice.core.plane.InfoPlane;
-import mon.lattice.im.dht.tomp2p.TomP2PDHTDataConsumerInfoPlane;
+import mon.lattice.distribution.udp.UDPDataPlaneConsumerWithNames;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -27,13 +23,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import mon.lattice.im.dht.planx.PlanxDHTDataConsumerInfoPlane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This receives measurements from a UDP Data Plane.
  */
-public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
+public final class ControllableDataConsumerDaemonWithPlanx extends Thread {
     DefaultControllableDataConsumer consumer;
     
     ID dataConsumerID;
@@ -55,7 +52,7 @@ public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
     PrintStream errStream;
 
     
-    public ZMQControllableDataConsumerForwarderDaemon(String myID,
+    public ControllableDataConsumerDaemonWithPlanx(String myID,
                                           int dataPort, 
                                           String infoPlaneRootName,   
                                           int infoPlaneRootPort,
@@ -69,25 +66,12 @@ public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
         
         this.localCtrlPair = new InetSocketAddress(InetAddress.getByName(controlAddr), controlPort);
         
+        String remoteCtrlAnnounceHost = infoPlaneRootName;
+        this.remoteCtrlPair = new InetSocketAddress(InetAddress.getByName(remoteCtrlAnnounceHost), 8888); // announce port is fixed to 8888
+        
         this.remoteInfoHost = infoPlaneRootName;
         this.localInfoPort = infoPlaneLocalPort;
         this.remoteInfoPort = infoPlaneRootPort;
-    }
-    
-    
-    
-    public ZMQControllableDataConsumerForwarderDaemon(String myID,
-                                          int dataPort, 
-                                          String infoPlaneRootName,   
-                                          int infoPlaneRootPort,
-                                          int infoPlaneLocalPort,
-                                          String controlAddr,
-                                          int controlPort,
-                                          int controlRemotePort) throws UnknownHostException {
-    
-        this(myID, dataPort, infoPlaneRootName, infoPlaneRootPort, infoPlaneLocalPort, controlAddr, controlPort);
-        // commeting out this as the infoPlaneRootName is no longer passed as parameter
-        //this.remoteCtrlPair = new InetSocketAddress(InetAddress.getByName(infoPlaneRootName), controlRemotePort);
     }
     
     
@@ -103,24 +87,18 @@ public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
         LOGGER.info("Connecting to the Control Plane using: " + localCtrlPair.getPort() + ":" + localCtrlPair.getHostName());
         
         // set up data plane listening on *:port
-	//consumer.setDataPlane(new UDPDataPlaneConsumer(dataPort));
-        //consumer.setDataPlane(new ZMQDataPlaneConsumer(dataPort));
-        consumer.setDataPlane(new ZMQDataPlaneConsumerAndForwarder(dataPort));
+	consumer.setDataPlane(new UDPDataPlaneConsumerWithNames(dataPort));
        
-        //InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort);
-        //InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(remoteInfoPort, localInfoPort); // announcing to broadcast
-        
-        InfoPlane infoPlane = new ZMQDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort);
-        
+        InfoPlane infoPlane = new PlanxDHTDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort);
         
         ((DataConsumerInteracter) infoPlane).setDataConsumer(consumer);
         consumer.setInfoPlane(infoPlane);
         
         ControlPlane controlPlane;
-        // if (this.remoteCtrlPair != null)
-        //    controlPlane = new UDPDataConsumerControlPlaneXDRConsumer(localCtrlPair, remoteCtrlPair);
-        // else
-        controlPlane = new ZMQDataConsumerControlPlaneXDRConsumer(localCtrlPair);
+        if (this.remoteCtrlPair != null)
+            controlPlane = new UDPDataConsumerControlPlaneXDRConsumer(localCtrlPair, remoteCtrlPair);
+        else
+            controlPlane = new UDPDataConsumerControlPlaneXDRConsumer(localCtrlPair);
         
         ((DataConsumerInteracter) controlPlane).setDataConsumer(consumer);
         consumer.setControlPlane(controlPlane);    
@@ -151,9 +129,8 @@ public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
         System.setProperty(org.slf4j.impl.SimpleLogger.LOG_FILE_KEY, logFile.getCanonicalPath());
         System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_SHORT_LOG_NAME_KEY, "true");
         System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_THREAD_NAME_KEY, "false");
-        //System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "debug");
         
-        LOGGER = LoggerFactory.getLogger(ZMQControllableDataConsumerForwarderDaemon.class);
+        LOGGER = LoggerFactory.getLogger(ControllableDataConsumerDaemonWithPlanx.class);
     }
     
     
@@ -186,9 +163,10 @@ public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
             int dataPort = 22997;
             String infoHost = null;
             int infoRemotePort= 6699;
-            int infoLocalPort = 10000;
+            int infoLocalPort = 6701;
             String controlEndPoint = null;
-            int controlRemotePort = 5555;
+            int controlLocalPort = 7701;
+            int controlRemotePort = 8888;
             
             Scanner sc;
                     
@@ -197,28 +175,28 @@ public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
                     String loopBack = InetAddress.getLoopbackAddress().getHostName();
                     infoHost = controlEndPoint = loopBack;
                     break;
-                case 5:
+                case 4:
                     sc = new Scanner(args[0]);
                     dataPort = sc.nextInt();
                     infoHost = args[1];
                     sc = new Scanner(args[2]);
                     infoRemotePort = sc.nextInt();
+                    //sc= new Scanner(args[3]);
+                    //infoLocalPort = sc.nextInt();
                     sc= new Scanner(args[3]);
-                    infoLocalPort = sc.nextInt();
-                    sc= new Scanner(args[4]);
                     controlRemotePort = sc.nextInt();
                     controlEndPoint = infoHost;
                     break;
-                case 6:
+                case 5:
                     dcID = args[0];
                     sc = new Scanner(args[1]);
                     dataPort = sc.nextInt();
                     infoHost = args[2];
                     sc = new Scanner(args[3]);
                     infoRemotePort = sc.nextInt();
+                    //sc= new Scanner(args[4]);
+                    //infoLocalPort = sc.nextInt();
                     sc= new Scanner(args[4]);
-                    infoLocalPort = sc.nextInt();
-                    sc= new Scanner(args[5]);
                     controlRemotePort = sc.nextInt();
                     controlEndPoint = infoHost;
                     break;
@@ -226,13 +204,13 @@ public final class ZMQControllableDataConsumerForwarderDaemon extends Thread {
                     LOGGER.error("usage: ControllableDataConsumerDaemon [dcID] localdataPort infoRemotePort infoLocalPort controlLocalPort");
                     System.exit(1);
             }
-            ZMQControllableDataConsumerForwarderDaemon dataConsumer = new ZMQControllableDataConsumerForwarderDaemon(dcID, 
+            ControllableDataConsumerDaemonWithPlanx dataConsumer = new ControllableDataConsumerDaemonWithPlanx(dcID, 
                                                                                    dataPort, 
                                                                                    infoHost, 
                                                                                    infoRemotePort, 
                                                                                    infoLocalPort, 
                                                                                    controlEndPoint, 
-                                                                                   controlRemotePort);
+                                                                                   controlLocalPort);
             dataConsumer.init();
             
         } catch (Exception e) {

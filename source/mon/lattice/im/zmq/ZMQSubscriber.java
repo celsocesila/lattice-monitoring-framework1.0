@@ -8,6 +8,7 @@ import mon.lattice.core.plane.AnnounceMessage;
 import mon.lattice.core.plane.DeannounceMessage;
 import java.util.HashMap;
 import java.util.Map;
+import mon.lattice.im.AbstractIMNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
@@ -15,6 +16,7 @@ import org.zeromq.ZMQException;
 import us.monoid.json.JSONArray;
 import us.monoid.json.JSONException;
 import us.monoid.json.JSONObject;
+import mon.lattice.im.IMSubscriberNode;
 
 /**
  * An ZMQSubscriber is responsible for receiving information about  
@@ -22,8 +24,7 @@ import us.monoid.json.JSONObject;
  * using ZMQ.
 **/
 
-public class ZMQSubscriber extends Thread {
-    String remoteHost;
+public class ZMQSubscriber extends AbstractIMNode implements IMSubscriberNode, Runnable {
     int remotePort = 0;
     int localPort = 0;
     
@@ -43,6 +44,8 @@ public class ZMQSubscriber extends Thread {
     Map<ID, JSONObject> reporters = new HashMap<>();
     
     AnnounceEventListener listener;
+    
+    Thread thread = new Thread(this, "zmq-info-subscriber");;
     
     static Logger LOGGER = LoggerFactory.getLogger(ZMQSubscriber.class);
 
@@ -122,14 +125,21 @@ public class ZMQSubscriber extends Thread {
         }
         
         subscriberSocket.connect(uri);
-        this.start();
+        thread.start();
         return true;
     }
     
     
+    @Override
+    public boolean connect() {
+        return this.connectAndListen();
+    }
+    
+    
+    
     public boolean bindAndListen() {
         subscriberSocket.bind("tcp://*:" + localPort);
-        this.start();
+        thread.start();
         return true;
     }
 
@@ -142,6 +152,7 @@ public class ZMQSubscriber extends Thread {
     /**
      * Disconnect from the DHT peers.
      */
+    @Override
     public boolean disconnect() {
         threadRunning = false;
         subscriberSocket.setLinger(0);
@@ -149,20 +160,24 @@ public class ZMQSubscriber extends Thread {
         return true;
     }
 
-    public String getRootHostname() {
+    @Override
+    public String getRemoteHostname() {
         return this.remoteHost;
     }
     
     
-    public boolean containsDataSource(ID dataSourceID) {
+    @Override
+    public boolean containsDataSource(ID dataSourceID, int timeOut) {
         return dataSources.containsKey(dataSourceID);
     }
     
 
-    public boolean containsDataConsumer(ID dataConsumerID) {
+    @Override
+    public boolean containsDataConsumer(ID dataConsumerID, int timeOut) {
         return dataConsumers.containsKey(dataConsumerID);
     }
     
+    @Override
     public Object getDataSourceInfo(ID dataSourceID, String info) {
         try {
             JSONObject dataSource = dataSources.get(dataSourceID);
@@ -175,6 +190,7 @@ public class ZMQSubscriber extends Thread {
     }
     
     
+    @Override
     public Object getProbeInfo(ID probeID, String info) {
         try {
             JSONObject probe = probes.get(probeID);
@@ -188,6 +204,7 @@ public class ZMQSubscriber extends Thread {
     
     
     
+    @Override
     public Object getProbeAttributeInfo(ID probeID, Integer field, String info) {
         try {
             JSONObject probeAttribute = probeAttributes.get(probeID);
@@ -200,6 +217,7 @@ public class ZMQSubscriber extends Thread {
     }
     
     
+    @Override
     public Object getDataConsumerInfo(ID dataConsumerID, String info) {
         try {
             JSONObject dataConsumer = dataConsumers.get(dataConsumerID);
@@ -212,6 +230,7 @@ public class ZMQSubscriber extends Thread {
     }
     
     
+    @Override
     public Object getReporterInfo(ID reporterID, String info) {
         try {
             JSONObject reporter = reporters.get(reporterID);
@@ -242,7 +261,6 @@ public class ZMQSubscriber extends Thread {
     
     @Override
     public void run() {
-        this.setName("zmq-info-subscriber");
         subscriberSocket.subscribe(messageFilter.getBytes());
         
         LOGGER.info("Listening for messages");
@@ -283,11 +301,11 @@ public class ZMQSubscriber extends Thread {
                 case "datasource":  
                     if (operation.equals("add")) {
                         dataSources.put(entityID, msgObj.getJSONObject("info"));
-                        fireEvent(new AnnounceMessage(entityID, EntityType.DATASOURCE));
+                        sendMessage(new AnnounceMessage(entityID, EntityType.DATASOURCE));
                     }
                     else if (operation.equals("remove")) {
                         dataSources.remove(entityID);
-                        fireEvent(new DeannounceMessage(entityID, EntityType.DATASOURCE));
+                        sendMessage(new DeannounceMessage(entityID, EntityType.DATASOURCE));
                     }
                     
                     LOGGER.trace("datasource map:\n");
@@ -350,11 +368,11 @@ public class ZMQSubscriber extends Thread {
                 case "dataconsumer":  
                     if (operation.equals("add")) {
                         dataConsumers.put(entityID, msgObj.getJSONObject("info"));
-                        fireEvent(new AnnounceMessage(entityID, EntityType.DATACONSUMER));
+                        sendMessage(new AnnounceMessage(entityID, EntityType.DATACONSUMER));
                     }
                     else if (operation.equals("remove")) {
                         dataConsumers.remove(entityID);
-                        fireEvent(new DeannounceMessage(entityID, EntityType.DATACONSUMER));
+                        sendMessage(new DeannounceMessage(entityID, EntityType.DATACONSUMER));
                     }
                     break;
                         
@@ -382,11 +400,13 @@ public class ZMQSubscriber extends Thread {
     
     
     
+    @Override
     public void addAnnounceEventListener(AnnounceEventListener l) {
         listener = l;
     }
 
-    protected void fireEvent(AbstractAnnounceMessage m) {
+    @Override
+    public void sendMessage(AbstractAnnounceMessage m) {
         listener.receivedAnnounceEvent(m);
     }
 }

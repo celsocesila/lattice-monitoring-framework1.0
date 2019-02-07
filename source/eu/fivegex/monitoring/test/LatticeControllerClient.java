@@ -1,6 +1,5 @@
 package eu.fivegex.monitoring.test;
 
-import eu.fivegex.monitoring.control.probescatalogue.ProbesCatalogue;
 import mon.lattice.control.ControlInterface;
 import mon.lattice.core.ID;
 import java.io.FileInputStream;
@@ -21,11 +20,14 @@ import static us.monoid.web.Resty.delete;
 import static us.monoid.web.Resty.put;
 import static us.monoid.web.Resty.content;
 import static us.monoid.web.Resty.form;
+import eu.fivegex.monitoring.control.probescatalogue.JSONProbesCatalogue;
+import static us.monoid.web.Resty.content;
+import static us.monoid.web.Resty.form;
 
 /**
  * Makes REST calls to the Lattice Controller through the REST API using Resty
  **/
-public class LatticeControllerClient implements ControlInterface<JSONObject>, DeploymentInterface<JSONObject>, ProbesCatalogue {
+public class LatticeControllerClient implements ControlInterface<JSONObject>, DeploymentInterface<JSONObject>, JSONProbesCatalogue {
     // A URI for a Lattice Controller to interact with
     String vimURI;
     Resty rest;

@@ -16,7 +16,7 @@ import mon.lattice.core.ID;
 import mon.lattice.core.plane.ControlPlane;
 import mon.lattice.core.plane.InfoPlane;
 import mon.lattice.distribution.udp.UDPDataPlaneConsumerWithNames;
-import mon.lattice.im.dht.DHTDataConsumerInfoPlane;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTDataConsumerInfoPlane;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -102,8 +102,8 @@ public final class ControllableDataConsumerDaemon extends Thread {
         // set up data plane listening on *:port
 	consumer.setDataPlane(new UDPDataPlaneConsumerWithNames(dataPort));
        
-        //InfoPlane infoPlane = new DHTDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort);
-        InfoPlane infoPlane = new DHTDataConsumerInfoPlane(remoteInfoPort, localInfoPort); // announcing to broadcast
+        //InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort);
+        InfoPlane infoPlane = new TomP2PDHTDataConsumerInfoPlane(remoteInfoPort, localInfoPort); // announcing to broadcast
         ((DataConsumerInteracter) infoPlane).setDataConsumer(consumer);
         consumer.setInfoPlane(infoPlane);
         
@@ -174,44 +174,44 @@ public final class ControllableDataConsumerDaemon extends Thread {
             String dcID = ID.generate().toString();
             //String dcAddr = null; listening on all the addresses
             int dataPort = 22997;
-            //String infoHost = null;
+            String infoHost = null;
             int infoRemotePort= 6699;
-            int infoLocalPort = 10000;
+            int infoLocalPort = 6701;
             String controlEndPoint = null;
-            int controlLocalPort = 2222;
-            //int controllerRemotePort = 8888; commenting out as we use announce on the Info Plane
+            int controlLocalPort = 7701;
+            int controlRemotePort = 8888;
             
             Scanner sc;
                     
             switch (args.length) {
                 case 0:
                     String loopBack = InetAddress.getLoopbackAddress().getHostName();
-                    /*infoHost = */ controlEndPoint = loopBack;
+                    infoHost = controlEndPoint = loopBack;
                     break;
                 case 4:
                     sc = new Scanner(args[0]);
                     dataPort = sc.nextInt();
-                    // infoHost = args[1];
-                    sc = new Scanner(args[1]);
+                    infoHost = args[1];
+                    sc = new Scanner(args[2]);
                     infoRemotePort = sc.nextInt();
-                    sc= new Scanner(args[2]);
-                    infoLocalPort = sc.nextInt();
+                    //sc= new Scanner(args[3]);
+                    //infoLocalPort = sc.nextInt();
                     sc= new Scanner(args[3]);
-                    controlLocalPort = sc.nextInt();
-                    controlEndPoint = InetAddress.getLocalHost().getHostName();
+                    controlRemotePort = sc.nextInt();
+                    controlEndPoint = infoHost;
                     break;
                 case 5:
                     dcID = args[0];
                     sc = new Scanner(args[1]);
                     dataPort = sc.nextInt();
-                    // infoHost = args[2];
-                    sc = new Scanner(args[2]);
+                    infoHost = args[2];
+                    sc = new Scanner(args[3]);
                     infoRemotePort = sc.nextInt();
-                    sc= new Scanner(args[3]);
-                    infoLocalPort = sc.nextInt();
+                    //sc= new Scanner(args[4]);
+                    //infoLocalPort = sc.nextInt();
                     sc= new Scanner(args[4]);
-                    controlLocalPort = sc.nextInt();
-                    controlEndPoint = InetAddress.getLocalHost().getHostName();
+                    controlRemotePort = sc.nextInt();
+                    controlEndPoint = infoHost;
                     break;
                 default:
                     LOGGER.error("usage: ControllableDataConsumerDaemon [dcID] localdataPort infoRemotePort infoLocalPort controlLocalPort");

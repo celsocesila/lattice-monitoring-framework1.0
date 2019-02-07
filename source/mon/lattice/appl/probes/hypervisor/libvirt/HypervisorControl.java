@@ -6,7 +6,7 @@
 package mon.lattice.appl.probes.hypervisor.libvirt;
 
 import mon.lattice.appl.demo.DynamicControl;
-import mon.lattice.im.dht.DHTDataSourceInfoPlane;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTDataSourceInfoPlane;
 import java.io.*;
 import java.net.InetAddress;
 import java.util.LinkedList;
@@ -243,7 +243,7 @@ public class HypervisorControl extends DynamicControl {
 	dataSource.setDataPlane(new MulticastDataPlaneProducerWithNames(dataGroup));
 
 	// set up info plane
-	dataSource.setInfoPlane(new DHTDataSourceInfoPlane(infoRoot, infoRootPort, localPort));
+	dataSource.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(infoRoot, infoRootPort, localPort));
 
 	dataSource.connect();
 

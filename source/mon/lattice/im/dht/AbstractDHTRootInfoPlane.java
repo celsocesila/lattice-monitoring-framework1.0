@@ -1,62 +1,46 @@
-// DHTInfoPlaneConsumer.java
+// TomP2PDHTInfoPlaneConsumer.java
 // Author: Stuart Clayman
 // Email: sclayman@ee.ucl.ac.uk
 // Date: Sept 2009
 
 package mon.lattice.im.dht;
 
+import mon.lattice.im.dht.tomp2p.*;
 import mon.lattice.im.delegate.ControlInformationManager;
 import mon.lattice.im.delegate.InfoPlaneDelegate;
 import mon.lattice.core.DataSource;
 import mon.lattice.core.ID;
 import mon.lattice.core.Probe;
 import mon.lattice.core.ProbeAttribute;
-import mon.lattice.core.plane.InfoPlane;
 import mon.lattice.core.Reporter;
 import mon.lattice.core.ControllableDataConsumer;
 import mon.lattice.core.plane.AbstractAnnounceMessage;
 import mon.lattice.core.plane.AnnounceEventListener;
 import mon.lattice.im.delegate.InfoPlaneDelegateInteracter;
-import mon.lattice.im.dht.tomp2p.IMNode;
 
 /**
- * A DHTInfoPlaneConsumer is an InfoPlane implementation
- * that collects data from the Information Model data.
+ * A TomP2PDHTInfoPlaneConsumer is an InfoPlane implementation
+ that collects data from the Information Model data.
  */
-public class DHTInfoPlaneConsumer extends AbstractDHTInfoPlane implements InfoPlane, InfoPlaneDelegateInteracter, AnnounceEventListener  {
+public abstract class AbstractDHTRootInfoPlane extends AbstractDHTInfoPlane implements InfoPlaneDelegateInteracter, AnnounceEventListener  {
     private InfoPlaneDelegate infoPlaneDelegate;
     
     AnnounceEventListener listener;
     
     // The hostname of the DHT root.
-    String rootHost;
+    protected String rootHost;
 
     // The port to connect to
-    int rootPort;
+    protected int rootPort;
 
     // The local port
-    int port;
+    protected int port;
 
     /**
      * Constructor for subclasses.
      */
-    DHTInfoPlaneConsumer() {
+    public AbstractDHTRootInfoPlane() {
         setInfoPlaneDelegate(new ControlInformationManager(this));
-    }
-
-
-    /**
-     * Construct a DHTInfoPlaneConsumer.
-     * Connect to the DHT root at hostname on port,
-     * and start here on localPort.
-     */
-    public DHTInfoPlaneConsumer(String remoteHostname, int remotePort, int localPort) {
-	rootHost = remoteHostname;
-	rootPort = remotePort;
-	port = localPort;
-
-	imNode = new IMNode(localPort, remoteHostname, remotePort);
-        imNode.addAnnounceEventListener(this);
     }
 
 
@@ -69,7 +53,7 @@ public class DHTInfoPlaneConsumer extends AbstractDHTInfoPlane implements InfoPl
     }
 
     /**
-     * Un-announce that the plane is up and running
+     * Un-sendMessage that the plane is up and running
      */
     public boolean dennounce() {
 	return true;

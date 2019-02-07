@@ -5,7 +5,7 @@ import mon.lattice.control.udp.UDPDataSourceControlPlaneXDRConsumer;
 import mon.lattice.core.ControllableDataSource;
 import mon.lattice.core.ID;
 import mon.lattice.distribution.udp.UDPDataPlaneProducerWithNames;
-import mon.lattice.im.dht.DHTDataSourceInfoPlane;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTDataSourceInfoPlane;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -102,9 +102,9 @@ public final class DataSourceDockerContainerDaemon extends Thread {
 	dataSource.setDataPlane(new UDPDataPlaneProducerWithNames(dataConsumerPair));
         
         if (remoteInfoHost != null)
-            dataSource.setInfoPlane(new DHTDataSourceInfoPlane(remoteInfoHost, remoteInfoPort, localInfoUDPPort, localInfoTCPPort));
+            dataSource.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(remoteInfoHost, remoteInfoPort, localInfoUDPPort, localInfoTCPPort));
         else
-            dataSource.setInfoPlane(new DHTDataSourceInfoPlane(remoteInfoPort, localInfoUDPPort, localInfoTCPPort)); // bootstraping using broadcast
+            dataSource.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(remoteInfoPort, localInfoUDPPort, localInfoTCPPort)); // bootstraping using broadcast
         
         if (this.remoteCtrlPair != null)
             dataSource.setControlPlane(new UDPDataSourceControlPlaneXDRConsumer(localCtrlPair, remoteCtrlPair));

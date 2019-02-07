@@ -1,8 +1,6 @@
 package mon.lattice.im.zmq;
 
-import mon.lattice.appl.datasources.DockerControllableDataSource;
 import mon.lattice.appl.datasources.DockerDataSource;
-import mon.lattice.appl.dataconsumers.DefaultControllableDataConsumer;
 import mon.lattice.core.ControllableDataConsumer;
 import mon.lattice.core.ControllableDataSource;
 import mon.lattice.core.ControllableReporter;
@@ -11,6 +9,11 @@ import mon.lattice.core.Probe;
 import mon.lattice.core.ProbeAttribute;
 import java.io.IOException;
 import java.util.Collection;
+import mon.lattice.core.plane.AbstractAnnounceMessage;
+import mon.lattice.core.plane.AnnounceEventListener;
+import mon.lattice.im.AbstractIMNode;
+import mon.lattice.im.IMBasicNode;
+import mon.lattice.im.IMPublisherNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
@@ -22,8 +25,8 @@ import us.monoid.json.JSONObject;
  attributes on the InfoPlane using ZMQ.
 **/
 
-public class ZMQPublisher {
-    String remoteHost;
+public class ZMQPublisher extends AbstractIMNode implements IMPublisherNode {
+    //String remoteHost;
     int remotePort = 0;
     
     ZMQ.Context context;
@@ -47,6 +50,7 @@ public class ZMQPublisher {
     /**
      * Connect to the proxy Subscriber.
      */
+    @Override
     public boolean connect() {
         String uri = "tcp://" + remoteHost + ":" + remotePort;
         publisherSocket.connect(uri);
@@ -60,6 +64,7 @@ public class ZMQPublisher {
     /**
      * Disconnect from the DHT peers.
      */
+    @Override
     public boolean disconnect() {
         publisherSocket.setLinger(0);
         publisherSocket.close();
@@ -83,7 +88,8 @@ public class ZMQPublisher {
     /**
      * Add data for a DataSource
      */
-public ZMQPublisher addDataSource(DataSource ds) throws IOException {
+    @Override
+    public ZMQPublisher addDataSource(DataSource ds) throws IOException {
         JSONObject infoObj = new JSONObject();
         JSONObject dataSourceInfo = new JSONObject();
         
@@ -105,19 +111,19 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
                 controlEndPoint.put("address", externalHost);
                 controlEndPoint.put("port", controlPort);
                 controlEndPoint.put("type", "socket/NAT");
-                dataSourceInfo.put("controlendpoint", controlEndPoint);
+                dataSourceInfo.put("controlEndPoint", controlEndPoint);
             }
             
             else
                 if (ds instanceof ControllableDataSource) {
                     dataSourceInfo.put("pid", ((ControllableDataSource) ds).getMyPID());
-                    dataSourceInfo.put("controlendpoint", ds.getControlPlane().getControlEndPoint());
+                    dataSourceInfo.put("controlEndPoint", ds.getControlPlane().getControlEndPoint());
                 }
             
             infoObj.put("entity", "datasource");
             infoObj.put("operation", "add"); // FIXME: could use an ENUM
             infoObj.put("info", dataSourceInfo);
-            
+            LOGGER.info(dataSourceInfo.toString());
  
         } catch(JSONException e) {
             LOGGER.error("Error while formatting info" + e.getMessage());
@@ -139,6 +145,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     /**
      * Add data for a Probe.
      */
+    @Override
     public ZMQPublisher addProbe(Probe aProbe) throws IOException {
         DataSource ds = (DataSource)aProbe.getProbeManager();
         JSONObject infoObj = new JSONObject();
@@ -173,6 +180,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     /**
      * Add data for a ProbeAttribute.
      */
+    @Override
     public ZMQPublisher addProbeAttribute(Probe aProbe, ProbeAttribute attr)  throws IOException {
         JSONObject infoObj = new JSONObject();
         JSONObject attrInfo = new JSONObject();
@@ -202,6 +210,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     }
     
     
+    @Override
     public ZMQPublisher addDataConsumer(ControllableDataConsumer dc) throws IOException {
         JSONObject infoObj = new JSONObject();
         JSONObject dataConsumerInfo = new JSONObject();
@@ -213,7 +222,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
             if (dc instanceof ControllableDataConsumer) {
                 dataConsumerInfo.put("pid",  ((ControllableDataConsumer) dc).getMyPID());
                 JSONObject controlEndPoint = new JSONObject(dc.getControlPlane().getControlEndPoint());
-                dataConsumerInfo.put("controlendpoint", controlEndPoint);
+                dataConsumerInfo.put("controlEndPoint", controlEndPoint);
             }
             
             infoObj.put("entity", "dataconsumer");
@@ -237,6 +246,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     
     
     
+    @Override
     public ZMQPublisher addReporter(ControllableReporter r) throws IOException {
         JSONObject infoObj = new JSONObject();
         try {
@@ -280,6 +290,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     /*
      * Remove stuff
      */
+    @Override
     public ZMQPublisher removeDataSource(DataSource ds) throws IOException {
         JSONObject infoObj = new JSONObject();
         try {
@@ -307,6 +318,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
 	return this;
     }
 
+    @Override
     public ZMQPublisher removeProbe(Probe aProbe) throws IOException {
         JSONObject infoObj = new JSONObject();
         try {
@@ -334,6 +346,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     }
     
 
+    @Override
     public ZMQPublisher removeProbeAttribute(Probe aProbe, ProbeAttribute attr)  throws IOException {
 	JSONObject infoObj = new JSONObject();
         try {
@@ -357,6 +370,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     }
 
     
+    @Override
     public ZMQPublisher removeDataConsumer(ControllableDataConsumer dc) throws IOException {
         JSONObject infoObj = new JSONObject();
         try {
@@ -385,6 +399,7 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
     }
     
     
+    @Override
     public ZMQPublisher removeReporter(ControllableReporter r) throws IOException {
         JSONObject infoObj = new JSONObject();
         try {
@@ -415,6 +430,41 @@ public ZMQPublisher addDataSource(DataSource ds) throws IOException {
         publisherSocket.sendMore(aKey);
         publisherSocket.send(aValue);
 	return true;    
+    }
+
+    @Override
+    public void addAnnounceEventListener(AnnounceEventListener l) {
+        throw new UnsupportedOperationException("Not supported by a Publisher");
+    }
+
+    @Override
+    public void sendMessage(AbstractAnnounceMessage m) {
+        throw new UnsupportedOperationException("Not supported by a Publisher");
+    }
+
+    @Override
+    public IMBasicNode addDataConsumerInfo(ControllableDataConsumer dc) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public IMBasicNode addDataSourceInfo(DataSource ds) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public IMBasicNode modifyDataSource(DataSource ds) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public IMBasicNode modifyProbe(Probe p) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public IMBasicNode modifyProbeAttribute(Probe p, ProbeAttribute pa) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

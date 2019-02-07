@@ -5,7 +5,6 @@
 
 package mon.lattice.im.dht;
 
-import mon.lattice.im.dht.tomp2p.IMNode;
 import mon.lattice.core.DataSource;
 import mon.lattice.core.Probe;
 import mon.lattice.core.ID;
@@ -21,10 +20,9 @@ import org.slf4j.LoggerFactory;
  * talk to the DataSource object it gets bound to.
  */
 public abstract class AbstractDHTInfoPlane implements InfoPlane  {
-    // An IMNode acts as a node in the DHT
-    IMNode imNode;
+    protected AbstractDHTIMNode imNode;
     
-    static Logger LOGGER = LoggerFactory.getLogger("DHTInfoPlane");
+    static protected Logger LOGGER = LoggerFactory.getLogger(AbstractDHTInfoPlane.class);
     
     public AbstractDHTInfoPlane() {
     }
@@ -32,6 +30,7 @@ public abstract class AbstractDHTInfoPlane implements InfoPlane  {
     /**
      * Connect to a delivery mechanism.
      */
+    @Override
     public boolean connect() {
 	return imNode.connect();
     }
@@ -39,43 +38,50 @@ public abstract class AbstractDHTInfoPlane implements InfoPlane  {
     /**
      * Disconnect from a delivery mechanism.
      */
+    @Override
     public boolean disconnect() {
 	return imNode.disconnect();
     }
 
     @Override
     public String getInfoRootHostname() {
-        return imNode.getRootHostname();
+        return imNode.getRemoteHostname();
     }
 
     
     
     // lookup some info in the InfoPlane
+    @Override
     public Object lookupDataSourceInfo(DataSource dataSource, String info) {
 	return imNode.getDataSourceInfo(dataSource.getID(), info);
     }
 
     // lookup some info in the InfoPlane
+    @Override
     public Object lookupDataSourceInfo(ID dataSourceID, String info) {
 	return imNode.getDataSourceInfo(dataSourceID, info);
     }
 
     // lookup some info in the InfoPlane
+    @Override
     public Object lookupProbeInfo(Probe probe, String info) {
 	return imNode.getProbeInfo(probe.getID(), info);
     }
 
     // lookup some info in the InfoPlane
+    @Override
     public Object lookupProbeInfo(ID probeID, String info) {
 	return imNode.getProbeInfo(probeID, info);
     }
 
     // lookup some info in the InfoPlane
+    @Override
     public Object lookupProbeAttributeInfo(Probe probe, int field, String info) {
 	return imNode.getProbeAttributeInfo(probe.getID(), field, info);
     }
 
     // lookup some info in the InfoPlane
+    @Override
     public Object lookupProbeAttributeInfo(ID probeID, int field, String info) {
 	return imNode.getProbeAttributeInfo(probeID, field, info);
     }
@@ -94,6 +100,7 @@ public abstract class AbstractDHTInfoPlane implements InfoPlane  {
     /**
      * Put a value in the InfoPlane.
      */
+    @Override
     public boolean putInfo(String key, Serializable value) {
 	return imNode.putDHT(key, value);
     }
@@ -101,6 +108,7 @@ public abstract class AbstractDHTInfoPlane implements InfoPlane  {
     /**
      * Get a value from the InfoPlane.
      */
+    @Override
     public Object getInfo(String key) {
 	return imNode.getDHT(key);
     }
@@ -108,10 +116,12 @@ public abstract class AbstractDHTInfoPlane implements InfoPlane  {
     /**
      * Remove a value from the InfoPlane.
      */
+    @Override
     public boolean removeInfo(String key) {
 	return imNode.remDHT(key);
     }
     
+    @Override
     public String toString() {
         return imNode.toString();
     }

@@ -7,22 +7,22 @@ package eu.fivegex.monitoring.control;
 
 import eu.fivegex.monitoring.control.probescatalogue.CatalogueException;
 import eu.fivegex.monitoring.control.probescatalogue.JSONProbeCatalogue;
-import eu.fivegex.monitoring.control.probescatalogue.ProbesCatalogue;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import mon.lattice.control.controller.json.ZMQController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.monoid.json.JSONException;
 import us.monoid.json.JSONObject;
+import eu.fivegex.monitoring.control.probescatalogue.JSONProbesCatalogue;
+import mon.lattice.control.controller.json.ZMQController;
 
 /**
  *
  * @author uceeftu
  */
-public class FiveGExController extends ZMQController implements ProbesCatalogue<JSONObject, JSONException> {
+public class FiveGExController extends ZMQController implements JSONProbesCatalogue {
     
     private static final FiveGExController CONTROLLER = new FiveGExController();
     
@@ -46,6 +46,7 @@ public class FiveGExController extends ZMQController implements ProbesCatalogue<
         probesSuffix = pr.getProperty("probes.suffix");
         probeCatalogue = new JSONProbeCatalogue(probesPackage, probesSuffix);
     }
+    
     
     @Override
     public JSONObject getProbesCatalogue() throws JSONException {

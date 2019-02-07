@@ -44,6 +44,15 @@
 	    <zipgroupfileset dir="../libs/core" includes="*.jar" />
     </jar>
 
+
+    <jar jarfile="${jars}/monitoring-bin-all-${release}.jar" 
+	    basedir="${classes}" includes="**" excludes="**/*.java"> 
+	    <zipgroupfileset dir="../libs/core" includes="*.jar" />
+	    <zipgroupfileset dir="../libs/controller" includes="*.jar" />
+	    <zipgroupfileset dir="../libs/misc" includes="*.jar" />
+    </jar>
+
+
     <jar jarfile="${jars}/monitoring-src-${release}.jar" basedir="${basedir}" includes="**" excludes="**/*.class" />
       
 </target>
@@ -56,7 +65,7 @@
               destdir="${api}"
 	      classpath="${external.jars}"
 	      excludepackagenames="eu.reservoir.demo, eu.reservoir.demo.OLD"
-              bottom="5GEx Monitoring ${release}"
+              bottom="Lattice Monitoring ${release}"
               author="false">
       <classpath>
         <pathelement location="${classes}"/>

@@ -5,6 +5,7 @@
  */
 package mon.lattice.im.delegate;
 
+import java.io.IOException;
 import mon.lattice.core.ID;
 import us.monoid.json.JSONArray;
 import us.monoid.json.JSONException;
@@ -22,15 +23,15 @@ public interface InfoPlaneDelegateConsumer {
     
     public JSONArray getDataConsumers() throws JSONException;
     
-    public ControlEndPointMetaData getDSAddressFromProbeID(ID probe) throws ProbeNotFoundException, DSNotFoundException;
+    public ControlEndPointMetaData getDSAddressFromProbeID(ID probe) throws ProbeNotFoundException, DSNotFoundException, IOException;
     
-    public ControlEndPointMetaData getDSAddressFromID(ID dataSource) throws DSNotFoundException;
+    public ControlEndPointMetaData getDSAddressFromID(ID dataSource) throws DSNotFoundException, IOException;
     
     public String getDSIDFromName(String dsName) throws DSNotFoundException;
     
-    public ControlEndPointMetaData getDCAddressFromID(ID dataConsumer) throws DCNotFoundException;
+    public ControlEndPointMetaData getDCAddressFromID(ID dataConsumer) throws DCNotFoundException, IOException;
     
-    public ControlEndPointMetaData getDCAddressFromReporterID(ID reporter) throws ReporterNotFoundException, DCNotFoundException;
+    public ControlEndPointMetaData getDCAddressFromReporterID(ID reporter) throws ReporterNotFoundException, DCNotFoundException, IOException;
     
     public Integer getDSPIDFromID(ID dataSource) throws DSNotFoundException;
     

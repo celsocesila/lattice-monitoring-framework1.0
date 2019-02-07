@@ -5,13 +5,13 @@ import mon.lattice.control.udp.UDPDataSourceControlPlaneXDRConsumer;
 import mon.lattice.core.ControllableDataSource;
 import mon.lattice.core.ID;
 import mon.lattice.distribution.udp.UDPDataPlaneProducerWithNames;
-import mon.lattice.im.dht.tomp2p.TomP2PDHTDataSourceInfoPlane;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import mon.lattice.im.dht.planx.PlanxDHTDataSourceInfoPlane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * This DataSource in a basic control point for probes that uses a Control Plane and an Info Plane and 
  * logs out/err to a file rather than standard streams.
  **/
-public final class DataSourceDaemon extends Thread {
+public final class DataSourceDaemonWithPlanx extends Thread {
     ControllableDataSource dataSource;
     
     ID dataSourceID;
@@ -49,7 +49,7 @@ public final class DataSourceDaemon extends Thread {
      * @param controlPlaneLocalPort the Control Plane port visible to the other nodes
      **/
     
-    public DataSourceDaemon(
+    public DataSourceDaemonWithPlanx(
                            String myID,
                            String myDSName, 
                            String dataConsumerName, 
@@ -68,8 +68,14 @@ public final class DataSourceDaemon extends Thread {
         this.dataConsumerPair = new InetSocketAddress(InetAddress.getByName(dataConsumerName), dataConsumerPort);
         this.localCtrlPair = new InetSocketAddress(InetAddress.getByName(localControlEndPoint), controlPlaneLocalPort);
         
+        String remoteCtrlAnnounceHost = infoPlaneRootName;
+        this.remoteCtrlPair = new InetSocketAddress(InetAddress.getByName(remoteCtrlAnnounceHost), 8888); // announce port is fixed to 8888
+        
+        this.localCtrlPair = new InetSocketAddress(InetAddress.getByName(localControlEndPoint), controlPlaneLocalPort);
+        
         this.remoteInfoHost = infoPlaneRootName;
         this.localInfoPort = infoPlaneLocalPort;
+        
         this.remoteInfoPort = infoPlaneRootPort;
     }
 
@@ -89,11 +95,9 @@ public final class DataSourceDaemon extends Thread {
         
 	// set up the planes
 	dataSource.setDataPlane(new UDPDataPlaneProducerWithNames(dataConsumerPair));
-        
-        if (remoteInfoHost != null)
-            dataSource.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort));
-        else
-            dataSource.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(remoteInfoPort, localInfoPort)); // bootstraping using broadcast
+
+        LOGGER.info(Integer.toString(localInfoPort));
+        dataSource.setInfoPlane(new PlanxDHTDataSourceInfoPlane(remoteInfoHost, remoteInfoPort, localInfoPort));
         
         if (this.remoteCtrlPair != null)
             dataSource.setControlPlane(new UDPDataSourceControlPlaneXDRConsumer(localCtrlPair, remoteCtrlPair));
@@ -129,7 +133,7 @@ public final class DataSourceDaemon extends Thread {
         System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_SHORT_LOG_NAME_KEY, "true");
         System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_THREAD_NAME_KEY, "false");
         
-        LOGGER = LoggerFactory.getLogger(DataSourceDaemon.class);
+        LOGGER = LoggerFactory.getLogger(DataSourceDaemonWithPlanx.class);
     }
     
     
@@ -204,7 +208,7 @@ public final class DataSourceDaemon extends Thread {
                     System.exit(1);
             }
             
-            DataSourceDaemon dataSourceDaemon = new DataSourceDaemon(
+            DataSourceDaemonWithPlanx dataSourceDaemon = new DataSourceDaemonWithPlanx(
                                                             dsID,
                                                             dsName, 
                                                             dataConsumerAddr, 

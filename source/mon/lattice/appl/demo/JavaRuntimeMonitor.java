@@ -5,7 +5,7 @@
 
 package mon.lattice.appl.demo;
 
-import mon.lattice.im.dht.DHTDataSourceInfoPlane;
+import mon.lattice.im.dht.tomp2p.TomP2PDHTDataSourceInfoPlane;
 import mon.lattice.appl.datasources.BasicDataSource;
 import mon.lattice.core.DataSource;
 import mon.lattice.core.Probe;
@@ -35,7 +35,7 @@ public class JavaRuntimeMonitor {
 	ds.setDataPlane(new MulticastDataPlaneProducerWithNames(address));
 
 	// set up info plane
-	ds.setInfoPlane(new DHTDataSourceInfoPlane(remHost, remPort, localPort));
+	ds.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(remHost, remPort, localPort));
 
 	ds.connect();
     }

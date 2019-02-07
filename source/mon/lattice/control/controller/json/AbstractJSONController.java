@@ -5,7 +5,6 @@
  */
 package mon.lattice.control.controller.json;
 
-import java.util.Properties;
 import mon.lattice.control.AbstractController;
 import mon.lattice.control.ControlInterface;
 import mon.lattice.control.ControlServiceException;
@@ -13,7 +12,6 @@ import mon.lattice.core.ID;
 import us.monoid.json.JSONException;
 import us.monoid.json.JSONObject;
 import mon.lattice.im.delegate.DSNotFoundException;
-import mon.lattice.im.delegate.InfoPlaneDelegate;
 import mon.lattice.core.Rational;
 import us.monoid.json.JSONArray;
 
@@ -21,33 +19,11 @@ import us.monoid.json.JSONArray;
  *
  * @author uceeftu
  */
-public abstract class AbstractJSONController extends AbstractController<JSONObject> implements ControlInterface<JSONObject> {           
-    protected InfoPlaneDelegate controlInformationManager;
-   
+public abstract class AbstractJSONController extends AbstractController<JSONObject> implements ControlInterface<JSONObject> {
     protected int controlLocalPort;
     protected int transmitterPoolSize;
-    protected int infoPlanePort; 
+    protected int infoPlanePort;
     
-    protected Properties pr;
-  
-//    protected String probesPackage; 
-//    protected String probesSuffix;
-//    
-//    protected String localJarPath;
-//    protected String jarFileName;
-//    protected String remoteJarPath;
-//    
-//    protected EntityDeploymentDelegate deploymentManager;
-//    protected Boolean usingDeploymentManager;
-//    
-//    protected String dsClassName;
-//    protected String dcClassName;
-//    
-//    protected JSONProbeCatalogue probeCatalogue;
-
-    
-    abstract public void initPlanes(); 
-        
     
     @Override
     public JSONObject getDataSourceInfo(String dsID) throws JSONException {

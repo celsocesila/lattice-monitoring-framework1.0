@@ -5,7 +5,6 @@
 
 package mon.lattice.im.dht;
 
-import mon.lattice.im.dht.tomp2p.IMNode;
 import mon.lattice.core.ControllableReporter;
 import mon.lattice.core.DataConsumerInteracter;
 import mon.lattice.core.DataSource;
@@ -13,79 +12,20 @@ import mon.lattice.core.ID;
 import mon.lattice.core.Probe;
 import mon.lattice.core.ProbeAttribute;
 import mon.lattice.core.Reporter;
-import mon.lattice.core.plane.InfoPlane;
 
 import java.io.IOException;
 import mon.lattice.core.ControllableDataConsumer;
 import mon.lattice.core.EntityType;
-import mon.lattice.core.plane.AbstractAnnounceMessage;
 import mon.lattice.core.plane.AnnounceMessage;
 import mon.lattice.core.plane.DeannounceMessage;
 
 /**
- * A DHTDataConsumerInfoPlane is an InfoPlane implementation
+ * A TomP2PDHTDataConsumerInfoPlane is an InfoPlane implementation
  that sends the Information Model data.
  */
 
-public class DHTDataConsumerInfoPlane extends AbstractDHTInfoPlane implements InfoPlane, DataConsumerInteracter {
-    ControllableDataConsumer dataConsumer;
-    // The hostname of the DHT root.
-    String rootHost;
-
-    // The port to connect to
-    int rootPort;
-
-    // The local port
-    int port;
-
-    /**
-     * Construct a DHTInfoPlane.
-     * Connect to the DHT root at hostname on port,
-     * and start here on localPort.
-     */
-    public DHTDataConsumerInfoPlane(String remoteHostname, int remotePort, int localPort) {
-	rootHost = remoteHostname;
-	rootPort = remotePort;
-	port = localPort;
-
-	imNode = new IMNode(localPort, remoteHostname, remotePort);
-    }
-    
-    public DHTDataConsumerInfoPlane(int remotePort, int localPort) {
-	rootPort = remotePort;
-	port = localPort;
-
-	imNode = new IMNode(localPort, remotePort);
-    }
-    
-
-    /**
-     * Connect to a delivery mechansim.
-     * In a DHTDataSourceInfoPlane we call announce.
-     */
-    public boolean connect() {
-        /*
-	if (super.connect()) {
-	    return announce();
-	} else {
-	    return false;
-	}*/
-        return super.connect();
-    }
-
-    /**
-     * Disconnect from a delivery mechanism.
-     * In a DHTDataSourceInfoPlane we call deannounce.
-     */
-    public boolean disconnect() {
-	/*if (super.disconnect()) {
-	    return dennounce();
-	} else {
-	    return false;
-	}*/
-        return super.disconnect();
-    }
-
+public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane implements DataConsumerInteracter {
+    protected ControllableDataConsumer dataConsumer;
 
     /**
      * Announce that the plane is up and running
@@ -96,13 +36,13 @@ public class DHTDataConsumerInfoPlane extends AbstractDHTInfoPlane implements In
     }
 
     /**
-     * Un-announce that the plane is up and running
+     * Un-sendMessage that the plane is up and running
      */
     public boolean dennounce() {
         try {
 	    imNode.removeDataConsumer(dataConsumer);
             
-            imNode.announce(new DeannounceMessage(dataConsumer.getID(), EntityType.DATACONSUMER));
+            imNode.sendMessage(new DeannounceMessage(dataConsumer.getID(), EntityType.DATACONSUMER));
 	    LOGGER.info("just deannounced this Data Consumer " + dataConsumer.getID());
 	    return true;
 	} catch (IOException ioe) {
@@ -116,7 +56,7 @@ public class DHTDataConsumerInfoPlane extends AbstractDHTInfoPlane implements In
 	    imNode.addDataConsumer(dc);
             imNode.addDataConsumerInfo(dc);
             
-            imNode.announce(new AnnounceMessage(dataConsumer.getID(), EntityType.DATACONSUMER));
+            imNode.sendMessage(new AnnounceMessage(dataConsumer.getID(), EntityType.DATACONSUMER));
 	    LOGGER.info("just announced this Data Consumer " + dc.getID());
 	    return true;
 	} catch (IOException ioe) {
@@ -231,9 +171,4 @@ public class DHTDataConsumerInfoPlane extends AbstractDHTInfoPlane implements In
     public Object lookupProbesOnDS(ID dataSourceID) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-
- 
-
-
 }

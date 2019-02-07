@@ -1,4 +1,4 @@
-// DistributedHashTable.java
+// PlanxDistributedHashTable.java
 // Author: Stuart Clayman
 // Email: sclayman@ee.ucl.ac.uk
 // Date: Oct 2008
@@ -20,9 +20,9 @@ import org.planx.routing.*;
  * A Distributed Hash Table implementation.
  * Values can be accessed and added from any one
  * of the distributed nodes.
- * @deprecated, use eu.fivegex.monitoring.im.dht.tomp2p.DistributedHashTable
+ * @deprecated, use tomp2p.DistributedHashTable
  **/
-public class DistributedHashTable {
+public class PlanxDistributedHashTable {
     Kademlia kademlia = null;
 
     Configuration conf = null;
@@ -38,7 +38,7 @@ public class DistributedHashTable {
     /**
      * Constructor a Distributed Hash Table on a specified port
      */
-    public DistributedHashTable(int port) throws IOException {
+    public PlanxDistributedHashTable(int port) throws IOException {
 	conf = new Configuration();
 	//conf.B = 10; // log base exponent
 	//conf.K = 2000;  //  Bucket size.          
@@ -58,12 +58,8 @@ public class DistributedHashTable {
 	InetSocketAddress connAddr;
 
 	connAddr = new InetSocketAddress(InetAddress.getByName(remAddress), remPort);
-
         
-        System.out.println("Before Connection: " + connAddr.toString());
-        long t1 = System.currentTimeMillis();
 	kademlia.connect(connAddr);
-        System.out.println("After Connection: " + (System.currentTimeMillis() - t1));
     }
 
     /**
@@ -94,7 +90,7 @@ public class DistributedHashTable {
     /**
      * Put an object into the DHT.
      */
-    public DistributedHashTable put(String aKey, Serializable aValue) throws IOException {
+    public PlanxDistributedHashTable put(String aKey, Serializable aValue) throws IOException {
 	Identifier key = new Identifier(aKey.getBytes());
 
 	kademlia.put(key, aValue);
@@ -105,7 +101,7 @@ public class DistributedHashTable {
     /**
      * Put an object into the DHT.
      */
-    public DistributedHashTable put(BigInteger aKey, Serializable aValue) throws IOException {
+    public PlanxDistributedHashTable put(BigInteger aKey, Serializable aValue) throws IOException {
 	Identifier key = new Identifier(aKey);
 
 	kademlia.put(key, aValue);
@@ -126,7 +122,7 @@ public class DistributedHashTable {
     /**
      * Removes the mapping with the specified key.
      */
-    public DistributedHashTable remove(String aKey) throws IOException {
+    public PlanxDistributedHashTable remove(String aKey) throws IOException {
 	Identifier key = new Identifier(new String(aKey).getBytes());
 
 	kademlia.remove(key);
@@ -137,7 +133,7 @@ public class DistributedHashTable {
     /**
      * Removes the mapping with the specified key.
      */
-    public DistributedHashTable remove(BigInteger aKey) throws IOException {
+    public PlanxDistributedHashTable remove(BigInteger aKey) throws IOException {
 	Identifier key = new Identifier(aKey);
 
 	kademlia.remove(key);

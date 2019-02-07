@@ -68,7 +68,7 @@ public class ZMQControllerInfoPlane extends AbstractZMQInfoPlane implements Info
     
     @Override
     public String getInfoRootHostname() {
-        return zmqSubscriber.getRootHostname();
+        return zmqSubscriber.getRemoteHostname();
     }
    
     

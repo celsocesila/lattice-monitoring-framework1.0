@@ -9,26 +9,28 @@ import mon.lattice.core.plane.InfoPlane;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Properties;
 import mon.lattice.control.udp.UDPControlPlaneXDRProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import mon.lattice.im.delegate.InfoPlaneDelegateInteracter;
 import mon.lattice.core.plane.ControlPlane;
-import mon.lattice.im.dht.tomp2p.TomP2PDHTRootInfoPlane;
+import mon.lattice.im.dht.planx.PlanxDHTRootInfoPlane;
 
 /**
  *
  * @author uceeftu
  */
-public class UDPController extends AbstractJSONRestController {
+public class UDPControllerWithPlanx extends AbstractJSONRestController {
     
-    private static final UDPController CONTROLLER = new UDPController();
+    private static final UDPControllerWithPlanx CONTROLLER = new UDPControllerWithPlanx();
     
     private static Logger LOGGER;
     
 
-    private UDPController() {
+    private UDPControllerWithPlanx() {
         
     }
     
@@ -43,24 +45,32 @@ public class UDPController extends AbstractJSONRestController {
         //announceListeningPort = Integer.parseInt(pr.getProperty("control.announceport"));
         transmitterPoolSize = Integer.parseInt(pr.getProperty("control.poolsize"));
         
-        InfoPlane infoPlane = new TomP2PDHTRootInfoPlane(infoPlanePort);
+        InfoPlane infoPlane = null;
+        
+        try {
+            LOGGER.info(InetAddress.getLocalHost().getHostName());
+            infoPlane = new PlanxDHTRootInfoPlane(InetAddress.getLocalHost().getHostName(), infoPlanePort);
+        } catch (UnknownHostException e) {
+            LOGGER.error("Error while Connecting to the Info Plane" + e.getMessage());
+            System.exit(1);
+        }
         
         // we get the ControlInformationManager from the InfoPlane
         controlInformationManager = ((InfoPlaneDelegateInteracter) infoPlane).getInfoPlaneDelegate();
         
         // setting the InfoPlane to send announce events to the ControlInformationManager
-        ((TomP2PDHTRootInfoPlane) infoPlane).addAnnounceEventListener(controlInformationManager);
+        //((PlanxDHTRootInfoPlane) infoPlane).addAnnounceEventListener(controlInformationManager);
         
 	setInfoPlane(infoPlane);
         
         // create a control plane producer 
         // announcePort to listen for announce Messages from DSs/DCs
         // maxPoolSize to instantiate a pool of UDP Transmitters (each transmitter is not connected to any specific DS)
-        //ControlPlane controlPlane = new UDPControlPlaneXDRProducer(8888, transmitterPoolSize);
+        ControlPlane controlPlane = new UDPControlPlaneXDRProducer(8888, transmitterPoolSize);
         
         // create a control plane producer without announce listening capabilities 
         // as this is implemented in the used info plane implementation
-        ControlPlane controlPlane = new UDPControlPlaneXDRProducer(transmitterPoolSize);
+        //ControlPlane controlPlane = new UDPControlPlaneXDRProducer(transmitterPoolSize);
         
         // setting a reference to the InfoPlaneDelegate on the Control Plane
         ((InfoPlaneDelegateInteracter) controlPlane).setInfoPlaneDelegate(controlInformationManager);
@@ -71,7 +81,7 @@ public class UDPController extends AbstractJSONRestController {
     }
     
     
-    public static UDPController getInstance() {
+    public static UDPControllerWithPlanx getInstance() {
         return CONTROLLER;
     }
     
@@ -81,7 +91,7 @@ public class UDPController extends AbstractJSONRestController {
         System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_SHORT_LOG_NAME_KEY, "true");
         System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_THREAD_NAME_KEY, "false");
         
-        LOGGER = LoggerFactory.getLogger(UDPController.class);
+        LOGGER = LoggerFactory.getLogger(UDPControllerWithPlanx.class);
         
         Properties prop = new Properties();
 	InputStream input = null;
@@ -89,7 +99,7 @@ public class UDPController extends AbstractJSONRestController {
         
         switch (args.length) {
             case 0:
-                propertiesFile = System.getProperty("user.home") + "/UDPController.properties";
+                propertiesFile = System.getProperty("user.home") + "/PlanxUDPController.properties";
                 break;
             case 1:
                 propertiesFile = args[0];
@@ -116,7 +126,7 @@ public class UDPController extends AbstractJSONRestController {
             }
         }
         
-        UDPController myController = UDPController.getInstance();
+        UDPControllerWithPlanx myController = UDPControllerWithPlanx.getInstance();
         myController.setPropertyHandler(prop);
         myController.initPlanes();
         myController.initDeployment();

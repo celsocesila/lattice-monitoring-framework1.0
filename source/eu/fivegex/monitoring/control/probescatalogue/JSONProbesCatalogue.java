@@ -5,12 +5,15 @@
  */
 package eu.fivegex.monitoring.control.probescatalogue;
 
+import us.monoid.json.JSONException;
+import us.monoid.json.JSONObject;
+
 /**
  *
  * @author uceeftu
  */
-public interface ProbesCatalogue <ReturnType, ExceptionType extends Throwable> {
-    ReturnType getProbesCatalogue() throws ExceptionType; 
+public interface JSONProbesCatalogue {
+    JSONObject getProbesCatalogue() throws JSONException; 
     
     void initCatalogue();
 }
