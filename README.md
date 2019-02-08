@@ -1,8 +1,8 @@
 # Lattice Monitoring Framework
-This project contains both the source code of the Lattice Monitoring Framework.
+This repository contains the source code of the Lattice Monitoring Framework.
 
 The main components of the framework are:
-- The Controller
+- The Monitoring Controller
 - Data Sources
 - Data Consumers
 
