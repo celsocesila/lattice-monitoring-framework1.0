@@ -39,17 +39,18 @@
 	    <zipgroupfileset dir="../libs/controller" includes="*.jar" />
     </jar>
 
-    <jar jarfile="${jars}/monitoring-bin-core-${release}.jar" 
+    <jar jarfile="${jars}/monitoring-bin-core-${release}.jar"
 	    basedir="${classes}" includes="**" excludes="**/*.java **/control/controller/** **/control/deployment/** **/control/probescatalogue/** **/test/*"> 
 	    <zipgroupfileset dir="../libs/core" includes="*.jar" />
     </jar>
 
 
-    <jar jarfile="${jars}/monitoring-bin-all-${release}.jar" 
-	    basedir="${classes}" includes="**" excludes="**/*.java"> 
+    <jar jarfile="${jars}/monitoring-bin-core-all-${release}.jar"
+	    basedir="${classes}" includes="**" excludes="**/*.java **/control/controller/** **/control/deployment/** **/control/probescatalogue/** **/test/*"> 
 	    <zipgroupfileset dir="../libs/core" includes="*.jar" />
-	    <zipgroupfileset dir="../libs/controller" includes="*.jar" />
 	    <zipgroupfileset dir="../libs/misc" includes="*.jar" />
+	    <zipgroupfileset dir="../libs/misc/tomP2P" includes="*.jar" />
+
     </jar>
 
 

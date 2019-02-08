@@ -18,7 +18,7 @@ $ ant dist
 The above command generates three different jar binary files in the jars directory:
 - `monitoring-bin-controller.jar` containing all the classes and dependencies related to the controller.
 - `monitoring-bin-core.jar` containing a subset of classes and dependencies that can be used for instantiating Data Sources and Data Consumers.
-- `monitoring-bin-all.jar` containing the whole set of classes and dependencies.
+- `monitoring-bin-core-all.jar` adds additional libraries and dependencies to the above bin-core jar.
 
 and also a jar containing the source code
 - `monitoring-src.jar`
@@ -41,22 +41,18 @@ is the local port used by the Controller when connecting to the Information Plan
 restconsole.localport = 6666
 ```
 is the port where the controller will listen for HTTP control requests.
-```
-probes.package = eu.fivegex.appl.probes
-probes.suffix = Probe
-```
-When generating the probe catalogue, the Controller will look for all the class files whose package name matches `eu.fivegex.appl.probes` and whose name terminates with the `Probe` suffix (e.g., `eu.fivegex.appl.probes.docker.DockerProbe.class`).
 
 ```
 deployment.enabled = true
 ```
 Can be set either to `true` or `false` and enables/disables respectively the automated Data Sources deployment functionality to a remote host (current implementation is based on SSH with public key authentication)
+
 ```
 deployment.localJarPath = /Users/lattice
 deployment.jarFileName = monitoring-bin-core.jar
 deployment.remoteJarPath = /tmp
-deployment.ds.className = eu.fivegex.monitoring.appl.datasources.ZMQDataSourceDaemon
-deployment.dc.className = eu.fivegex.monitoring.appl.dataconsumers.ZMQControllableDataConsumerDaemon
+deployment.ds.className = mon.lattice.appl.datasources.ZMQDataSourceDaemon
+deployment.dc.className = mon.lattice.appl.dataconsumers.ZMQControllableDataConsumerDaemon
 ```
 The above settings allow to specify (in order):
 - the path where the jar (to be used for the Data Sources / Consumers automated remote deployment) is located
