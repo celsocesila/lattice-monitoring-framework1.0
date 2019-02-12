@@ -10,7 +10,7 @@
  
     <property name="external.controller.jars" value="${external.core.jars}:../libs/controller/restconsole-0.1.0.jar:../libs/controller/simple-4.1.21.jar:../libs/controller/jsch-0.1.53.jar" />
 
-    <property name="external.others.jars" value="../libs/misc/mongo-java-driver-3.2.2.jar:../libs/misc/koala-xmlstore-0.5.4.jar:../libs/misc/TomP2P-4.4.jar:../libs/misc/netty-3.5.3.Patched.jar"/>
+    <property name="external.others.jars" value="../libs/misc/mongo-java-driver-3.2.2.jar:../libs/misc/koala-xmlstore-0.5.4.jar:../libs/misc/tomP2P/TomP2P-4.4.jar:../libs/misc/tomP2P/netty-3.5.3.Patched.jar:../libs/misc/protobuf-java-3.3.1.jar"/>
 
     <property name="api" value="${basedir}/docs"/>    
     <property name="year" value="2019"/>
