@@ -58,10 +58,22 @@ public abstract class AbstractJSONController extends AbstractController<JSONObje
         result.put("operation", "loadProbe");
         result.put("probeClassName",probeClassName);
         
-        Object [] probeArgsAsObjects = (Object[]) null;//new Object[0];
+        String [] probeArgsAsStrings;
+        Object [] probeArgsAsObjects = (Object []) null;
         
         if (!probeArgs.isEmpty()) {
-            probeArgsAsObjects = (Object[])probeArgs.split(" ");
+            probeArgsAsStrings = probeArgs.split(" ");
+            probeArgsAsObjects = new Object[probeArgsAsStrings.length];
+            for (int i=0; i<probeArgsAsStrings.length; i++) {
+                if (probeArgsAsStrings[i].contains("[")) {
+                    String trimmedListArg = probeArgsAsStrings[i].substring(1, probeArgsAsStrings[i].length()-2);
+                    String [] listArg = trimmedListArg.split(",");
+                    probeArgsAsObjects[i] = new Object[listArg.length];
+                    probeArgsAsObjects[i] = (Object[])listArg;
+                }
+                else
+                    probeArgsAsObjects[i] = probeArgsAsStrings[i];
+            }
         }
         
         try {
