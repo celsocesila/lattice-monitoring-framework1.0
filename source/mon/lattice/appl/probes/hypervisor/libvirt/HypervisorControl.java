@@ -7,13 +7,12 @@ package mon.lattice.appl.probes.hypervisor.libvirt;
 
 import mon.lattice.appl.demo.DynamicControl;
 import mon.lattice.im.dht.tomp2p.TomP2PDHTDataSourceInfoPlane;
-import java.io.*;
 import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.Scanner;
+import mon.lattice.core.ID;
 import mon.lattice.distribution.multicast.MulticastDataPlaneProducerWithNames;
 import mon.lattice.distribution.multicast.MulticastAddress;
-import org.libvirt.*;
 
 /**
  * This class monitors a user's processes.
@@ -29,7 +28,7 @@ public class HypervisorControl extends DynamicControl {
     long startTime = 0;
 
     // the HypervisorDataSource
-    HypervisorDataSource dataSource;
+    HypervisorDataSourceDaemon dataSource;
 
     // a list of seen vees
     LinkedList<String> seenVEEs;
@@ -73,7 +72,7 @@ public class HypervisorControl extends DynamicControl {
     /**
      * Set the DataSource which creates the probes.
      */
-    public HypervisorControl setDataSource(HypervisorDataSource dataSource) {
+    public HypervisorControl setDataSource(HypervisorDataSourceDaemon dataSource) {
 	this.dataSource = dataSource;
 	return this;
     }
@@ -169,87 +168,73 @@ public class HypervisorControl extends DynamicControl {
      * Main entry point.
      */
     public static void main(String[] args) {
-	String addr = "229.229.0.1";
-	int port = 2299;
-	String infoRoot = "localhost";
-	int infoRootPort = 6699;
-	int localPort = 12567;
-
-	
-	if (args.length == 0) {
-	    // use existing settings
-	} else if (args.length == 2) {
-	    // multicast address
-	    addr = args[0];
-	    // multicast port
-	    Scanner sc = new Scanner(args[1]);
-	    port = sc.nextInt();
-
-	} else if (args.length == 2) {
-	    // multicast address
-	    addr = args[0];
-	    // multicast port
-	    Scanner sc = new Scanner(args[1]);
-	    port = sc.nextInt();
-
-	} else if (args.length == 4) {
-	    // multicast address
-	    addr = args[0];
-	    // multicast port
-	    Scanner sc = new Scanner(args[1]);
-	    port = sc.nextInt();
-
-	    // info root host
-	    infoRoot = args[2];
-	    // info root port
-	    sc = new Scanner(args[3]);
-	    infoRootPort = sc.nextInt();
-
-	} else if (args.length == 5) {
-	    // multicast address
-	    addr = args[0];
-	    // multicast port
-	    Scanner sc = new Scanner(args[1]);
-	    port = sc.nextInt();
-
-	    // info root host
-	    infoRoot = args[2];
-	    // info root port
-	    sc = new Scanner(args[3]);
-	    infoRootPort = sc.nextInt();
-	    // info local port
-	    sc = new Scanner(args[4]);
-	    localPort = sc.nextInt();
-
-
-	} else {
-	    System.err.println("HypervisorControl [multicast-address port] [infoModelHost infoModelPort [local_port]]");
-	    System.exit(1);
-	}
+	try {
+            String dsID = ID.generate().toString();
+            String dsName = null;
+            String dataConsumerAddr = null;
+            int dataConsumerPort = 22997;
+            String infoHost = null;
+            int infoRemotePort= 6699;
+            String controllerHost = null;
+            int controllerPort = 5555;
+            
+            Scanner sc;
+                    
+            switch (args.length) {
+                case 0:
+                    // use existing settings
+                    String loopBack = InetAddress.getLoopbackAddress().getHostName();
+                    dsName = dataConsumerAddr = controllerHost = loopBack;
+                    infoHost = InetAddress.getLocalHost().getHostName();
+                    break;
+                case 5:
+                    dataConsumerAddr = args[0];
+                    sc = new Scanner(args[1]);
+                    dataConsumerPort = sc.nextInt();
+                    infoHost = controllerHost = args[2];
+                    sc = new Scanner(args[3]);
+                    infoRemotePort = sc.nextInt();
+                    sc= new Scanner(args[4]);
+                    controllerPort = sc.nextInt();
+                    dsName = InetAddress.getLocalHost().getHostName();
+                    break;
+                case 6:
+                    dsID = args[0];
+                    dataConsumerAddr = args[1];
+                    sc = new Scanner(args[2]);
+                    dataConsumerPort = sc.nextInt();
+                    infoHost = controllerHost = args[3];
+                    sc = new Scanner(args[4]);
+                    infoRemotePort = sc.nextInt();
+                    sc= new Scanner(args[5]);
+                    controllerPort = sc.nextInt();
+                    dsName = InetAddress.getLocalHost().getHostName();
+                    break;
+                default:
+                    System.err.println("use: HypervisorControl [UUID] dcAddress dcPort infoHost infoPort controllerHost controllerPort");
+                    System.exit(1);
+            }
 
 	// allocate a HypervisorControl to interact with the HypervisorDataSource
-	HypervisorControl control = new HypervisorControl("xen:///");
+	HypervisorControl control = new HypervisorControl("qemu:///system");
 
 	// allocate a DataSource that can add and delete new PS probes
-	HypervisorDataSource dataSource = new HypervisorDataSource("localhost");
+	HypervisorDataSourceDaemon dataSource = new HypervisorDataSourceDaemon(
+                                                            dsID,
+                                                            dsName, 
+                                                            dataConsumerAddr, 
+                                                            dataConsumerPort, 
+                                                            infoHost, 
+                                                            infoRemotePort,
+                                                            controllerHost, 
+                                                            controllerPort);
 
 	control.setDataSource(dataSource);
-
-	// set up multicast addresses
-	MulticastAddress dataGroup = new MulticastAddress(addr, port);
-	System.err.println("HypervisorControl running on " + addr + "/" + port + " ....");
-
-	// set up data plane
-	dataSource.setDataPlane(new MulticastDataPlaneProducerWithNames(dataGroup));
-
-	// set up info plane
-	dataSource.setInfoPlane(new TomP2PDHTDataSourceInfoPlane(infoRoot, infoRootPort, localPort));
-
-	dataSource.connect();
-
-	// activate the  control
 	control.activateControl();
+        
+        } catch (Exception ex) {
+                ex.printStackTrace();
+                System.err.println("Error while starting the Data Source " + ex.getMessage());
+        }
     }
-
-
 }

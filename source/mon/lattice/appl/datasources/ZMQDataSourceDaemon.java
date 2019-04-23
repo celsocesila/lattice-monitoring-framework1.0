@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
  * This DataSource in a basic control point for probes that uses a Control Plane and an Info Plane and 
  * logs out/err to a file rather than standard streams.
  **/
-public final class ZMQDataSourceDaemon extends Thread {
-    ControllableDataSource dataSource;
+public class ZMQDataSourceDaemon extends Thread {
+    protected ControllableDataSource dataSource;
     
     ID dataSourceID;
     String dataSourceName;
