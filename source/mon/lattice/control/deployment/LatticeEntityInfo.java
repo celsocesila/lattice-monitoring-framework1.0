@@ -26,6 +26,7 @@ public abstract class LatticeEntityInfo {
     int pID;
     
     boolean running;
+    long startedTime;
     
     public LatticeEntityInfo(EntityType t, String name, String args) {
         this.entityType = t;
@@ -69,6 +70,14 @@ public abstract class LatticeEntityInfo {
     
     public boolean isRunning() {
         return this.running;
+    }
+
+    public long getStartedTime() {
+        return startedTime;
+    }
+
+    public void setStartedTime() {
+        this.startedTime = System.currentTimeMillis();
     }
     
     

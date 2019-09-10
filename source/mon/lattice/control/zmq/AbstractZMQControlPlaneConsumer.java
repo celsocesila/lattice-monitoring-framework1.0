@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
  * @author uceeftu
  */
 public abstract class AbstractZMQControlPlaneConsumer implements ControlPlane, ReceivingAndReplying, Transmitting {
-    ZMQReceiver zmqReceiver;
-    String routerAddress;
-    int routerPort;
+    protected ZMQReceiver zmqReceiver;
+    protected String routerAddress;
+    protected int routerPort;
     
     static Logger LOGGER = LoggerFactory.getLogger("ControlPlaneConsumer");
 

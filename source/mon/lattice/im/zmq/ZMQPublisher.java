@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
 import us.monoid.json.JSONException;
 import us.monoid.json.JSONObject;
+import mon.lattice.control.agents.ControllerAgent;
 
 /**
  * An ZMQPublisher is responsible for sending information about  DataSource, ControllableDataConsumer and Probe
@@ -269,6 +270,36 @@ public class ZMQPublisher extends AbstractIMNode implements IMPublisherNode {
 	return this;
     }
     
+    
+    @Override
+    public ZMQPublisher addControllerAgent(ControllerAgent agent) throws IOException {
+        JSONObject infoObj = new JSONObject();
+        JSONObject controllerAgentInfo = new JSONObject();
+        
+        try {
+            controllerAgentInfo.put("id", agent.getID().toString());
+            controllerAgentInfo.put("name", agent.getName());
+            
+            controllerAgentInfo.put("pid", (agent.getPID()));
+            controllerAgentInfo.put("controlEndPoint", agent.getControlPlane().getControlEndPoint());
+                
+            
+            infoObj.put("entity", "controlleragent");
+            infoObj.put("operation", "add"); // FIXME: could use an ENUM
+            infoObj.put("info", controllerAgentInfo);
+            LOGGER.info(controllerAgentInfo.toString());
+ 
+        } catch(JSONException e) {
+            LOGGER.error("Error while formatting info" + e.getMessage());
+            throw new IOException(e.getMessage());
+        }
+        
+        sendInfo("info.controlleragent", infoObj.toString());
+        
+	return this;
+    }
+    
+    
 
     /*
      * Modify stuff
@@ -422,6 +453,29 @@ public class ZMQPublisher extends AbstractIMNode implements IMPublisherNode {
     }
     
 
+    @Override
+    public IMBasicNode removeControllerAgent(ControllerAgent agent) throws IOException {
+        JSONObject infoObj = new JSONObject();
+        try {
+            JSONObject agentInfo = new JSONObject();
+            
+            agentInfo.put("id", agent.getID().toString());
+        
+            infoObj.put("entity","controlleragent");
+            infoObj.put("operation", "remove"); // FIXME: could use an ENUM
+            infoObj.put("info", agentInfo);
+            
+            
+        } catch (JSONException e) {
+             LOGGER.error("Error" + e.getMessage());
+        }
+	  
+        sendInfo("info.controlleragent", infoObj.toString());
+        
+	return this;
+    }
+    
+    
     /**
      * Send stuff to the Subscribers.
      */

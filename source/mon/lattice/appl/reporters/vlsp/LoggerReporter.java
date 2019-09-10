@@ -46,29 +46,40 @@ public final class LoggerReporter extends AbstractReporter {
         StringBuilder lcs = new StringBuilder();
         
         for (int i=0; i < rowsNumber; i++) {
+            LOGGER.info("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            
             row = table.getRow(0);
             
-            int j=0;
-            lcs.append("Host ID: ");
-            lcs.append(row.get(j).getValue());
+            int j;
             
-            for (j=1; j < columnsNumber-1; j++) {
+            lcs.append("Slice ID: ");
+            lcs.append(m.getGroupID());
+            
+            for (j=0; j < 2; j++) {
                 lcs.append(" ");
                 lcs.append(columnDefinitions.get(j).getName());
                 lcs.append(": ");
                 lcs.append(row.get(j).getValue());
             }
             
-            // prnnt routers table now
-            //
+            LOGGER.info(lcs.toString());
+            lcs.setLength(0);
             
+            
+            for (; j < columnsNumber-1; j++) {
+                lcs.append(columnDefinitions.get(j).getName());
+                lcs.append(": ");
+                lcs.append(row.get(j).getValue());
+                lcs.append(" ");
+            }
+            
+            // print routers table now
             Table routersTable = (Table)row.get(j).getValue();
-            columnDefinitions = table.getColumnDefinitions();
+            columnDefinitions = routersTable.getColumnDefinitions();
             
             rowsNumber = routersTable.getRowCount();
             columnsNumber = routersTable.getColumnCount();
             
-            LOGGER.info("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
             LOGGER.info(lcs.toString());
             
             StringBuilder router = new StringBuilder();
@@ -88,6 +99,7 @@ public final class LoggerReporter extends AbstractReporter {
             }
         
         LOGGER.info("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        LOGGER.info("\n");
         }        
     }
 }

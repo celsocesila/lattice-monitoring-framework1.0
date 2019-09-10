@@ -6,13 +6,10 @@
 package mon.lattice.appl.probes.hypervisor.libvirt;
 
 import mon.lattice.appl.demo.DynamicControl;
-import mon.lattice.im.dht.tomp2p.TomP2PDHTDataSourceInfoPlane;
 import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.Scanner;
 import mon.lattice.core.ID;
-import mon.lattice.distribution.multicast.MulticastDataPlaneProducerWithNames;
-import mon.lattice.distribution.multicast.MulticastAddress;
 
 /**
  * This class monitors a user's processes.
@@ -178,6 +175,8 @@ public class HypervisorControl extends DynamicControl {
             String controllerHost = null;
             int controllerPort = 5555;
             
+            String hypervisorURI = "qemu:///system";
+            
             Scanner sc;
                     
             switch (args.length) {
@@ -187,7 +186,7 @@ public class HypervisorControl extends DynamicControl {
                     dsName = dataConsumerAddr = controllerHost = loopBack;
                     infoHost = InetAddress.getLocalHost().getHostName();
                     break;
-                case 5:
+                case 6:
                     dataConsumerAddr = args[0];
                     sc = new Scanner(args[1]);
                     dataConsumerPort = sc.nextInt();
@@ -197,8 +196,9 @@ public class HypervisorControl extends DynamicControl {
                     sc= new Scanner(args[4]);
                     controllerPort = sc.nextInt();
                     dsName = InetAddress.getLocalHost().getHostName();
+                    hypervisorURI = args[5];
                     break;
-                case 6:
+                case 7:
                     dsID = args[0];
                     dataConsumerAddr = args[1];
                     sc = new Scanner(args[2]);
@@ -209,6 +209,7 @@ public class HypervisorControl extends DynamicControl {
                     sc= new Scanner(args[5]);
                     controllerPort = sc.nextInt();
                     dsName = InetAddress.getLocalHost().getHostName();
+                    hypervisorURI = args[6];
                     break;
                 default:
                     System.err.println("use: HypervisorControl [UUID] dcAddress dcPort infoHost infoPort controllerHost controllerPort");
@@ -216,7 +217,7 @@ public class HypervisorControl extends DynamicControl {
             }
 
 	// allocate a HypervisorControl to interact with the HypervisorDataSource
-	HypervisorControl control = new HypervisorControl("qemu:///system");
+	HypervisorControl control = new HypervisorControl(hypervisorURI);
 
 	// allocate a DataSource that can add and delete new PS probes
 	HypervisorDataSourceDaemon dataSource = new HypervisorDataSourceDaemon(

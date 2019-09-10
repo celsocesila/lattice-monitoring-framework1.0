@@ -417,12 +417,23 @@ public class PlanxIMNode extends AbstractDHTIMNode {
             return dht.contains(newKey);
         } 
         catch (IOException ioe) {
-            LOGGER.error("IMNode: containsDataConsumer failed for DS " + dataConsumerID);
+            LOGGER.error("IMNode: containsDataConsumer failed for DC " + dataConsumerID);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean containsControllerAgent(ID controllerAgentID, int timeout) {
+        try {
+            BigInteger newKey = keyToBigInteger("/controlleragent/" + controllerAgentID + "/name");
+            return dht.contains(newKey);
+        } 
+        catch (IOException ioe) {
+            LOGGER.error("IMNode: containsControllerAgent failed for agent " + controllerAgentID);
             return false;
         }
     }
     
-
 
     /**
      * Put stuff into DHT.

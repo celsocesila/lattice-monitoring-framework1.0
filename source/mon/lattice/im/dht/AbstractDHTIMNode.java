@@ -19,9 +19,11 @@ import mon.lattice.core.ID;
 import mon.lattice.core.Probe;
 import mon.lattice.core.ProbeAttribute;
 import mon.lattice.im.AbstractIMNode;
+import mon.lattice.im.IMBasicNode;
 import mon.lattice.im.IMPublisherNode;
 import mon.lattice.im.IMSubscriberNode;
 import static mon.lattice.im.dht.AbstractDHTInfoPlane.LOGGER;
+import mon.lattice.control.agents.ControllerAgent;
 
 /**
  *
@@ -191,7 +193,7 @@ public abstract class AbstractDHTIMNode extends AbstractIMNode implements IMPubl
 	return this;
 
     }
-
+    
     /*
      * Modify stuff
      */
@@ -336,4 +338,24 @@ public abstract class AbstractDHTIMNode extends AbstractIMNode implements IMPubl
     public Object getReporterInfo(ID reporterID, String info) {
 	return getDHT("/reporter/" + reporterID + "/" + info);
     }
+
+    
+    @Override
+    public Object getProbesOnDataSource(ID dsID) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+    
+    
+    @Override
+    public AbstractDHTIMNode addControllerAgent(ControllerAgent agent) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public IMBasicNode removeControllerAgent(ControllerAgent agent) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }

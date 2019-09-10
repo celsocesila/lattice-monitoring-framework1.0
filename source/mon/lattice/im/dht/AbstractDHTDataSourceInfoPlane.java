@@ -11,13 +11,13 @@ import mon.lattice.core.DataSource;
 import mon.lattice.core.DataSourceDelegate;
 import mon.lattice.core.DataSourceDelegateInteracter;
 import mon.lattice.core.EntityType;
-import mon.lattice.core.ID;
 import mon.lattice.core.Probe;
 import mon.lattice.core.ProbeAttribute;
 import mon.lattice.core.Reporter;
 import mon.lattice.core.plane.AnnounceMessage;
 import mon.lattice.core.plane.DeannounceMessage;
 import static mon.lattice.im.dht.AbstractDHTInfoPlane.LOGGER;
+import mon.lattice.control.agents.ControllerAgent;
 
 /**
  *
@@ -51,6 +51,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Un-sendMessage that the plane is up and running
      */
+    @Override
     public boolean dennounce() {
         try {
             DataSource dataSource = dataSourceDelegate.getDataSource();
@@ -68,6 +69,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Get the DataSourceDelegate this is a delegate for.
      */
+    @Override
     public DataSourceDelegate getDataSourceDelegate() {
 	return dataSourceDelegate;
     }
@@ -75,6 +77,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Set the DataSourceDelegate this is a delegate for.
      */
+    @Override
     public DataSourceDelegate setDataSourceDelegate(DataSourceDelegate ds) {
 	//System.out.println("DHTInfoPlane: setDataSource: " + ds);
 	dataSourceDelegate = ds;
@@ -84,6 +87,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Add a DataSource
      */
+    @Override
     public boolean addDataSourceInfo(DataSource ds) {
 	try {
 	    // adds further information for the DS
@@ -97,6 +101,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Add a Probe
      */
+    @Override
     public boolean addProbeInfo(Probe p) {
 	try {
 	    imNode.addProbe(p);
@@ -114,6 +119,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Add a ProbeAttribute to a ProbeAttribute
      */
+    @Override
     public boolean addProbeAttributeInfo(Probe p, ProbeAttribute pa) {
 	try {
 	    imNode.addProbeAttribute(p, pa);
@@ -128,6 +134,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Modify a DataSource
      */
+    @Override
     public boolean modifyDataSourceInfo(DataSource ds) {
 	try {
 	    imNode.modifyDataSource(ds);
@@ -142,6 +149,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Modify a Probe
      */
+    @Override
     public boolean modifyProbeInfo(Probe p) {
 	try {
 	    imNode.modifyProbe(p);
@@ -156,6 +164,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Modify a ProbeAttribute from a Probe
      */
+    @Override
     public boolean modifyProbeAttributeInfo(Probe p, ProbeAttribute pa) {
 	try {
 	    imNode.modifyProbeAttribute(p, pa);
@@ -171,6 +180,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Remove a DataSource
      */
+    @Override
     public boolean removeDataSourceInfo(DataSource ds) {
 	try {
 	    imNode.removeDataSource(ds);
@@ -185,6 +195,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Remove a Probe
      */
+    @Override
     public boolean removeProbeInfo(Probe p) {
 	try {
 	    imNode.removeProbe(p);
@@ -199,6 +210,7 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
     /**
      * Remove a ProbeAttribute from a Probe
      */
+    @Override
     public boolean removeProbeAttributeInfo(Probe p, ProbeAttribute pa) {
 	try {
 	    imNode.removeProbeAttribute(p, pa);
@@ -209,7 +221,10 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
 	    return false;
 	}
     }
-
+    
+    
+    /* A Data Source cannot modify any Data Consumer related info plane items */
+    
     @Override
     public boolean addDataConsumerInfo(ControllableDataConsumer dc) {
         return false;
@@ -230,21 +245,16 @@ public abstract class AbstractDHTDataSourceInfoPlane extends AbstractDHTInfoPlan
         return false;
     }
 
+    /* A Data Source cannot modify any Controller Agent related info plane items */
+    
     @Override
-    public boolean containsDataSource(ID dataSourceID, int timeOut) {
-        throw new UnsupportedOperationException("Not supported on a Data Source");
+    public boolean addControllerAgentInfo(ControllerAgent agent) {
+        return false;
     }
 
     @Override
-    public boolean containsDataConsumer(ID dataConsumerID, int timeOut) {
-        throw new UnsupportedOperationException("Not supported on a Data Source");
+    public boolean removeControllerAgentInfo(ControllerAgent agent) {
+        return false;
     }
-
-    @Override
-    public Object lookupProbesOnDS(ID dataSourceID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
-    
+  
 }

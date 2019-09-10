@@ -7,29 +7,30 @@ package mon.lattice.im.dht;
 
 import mon.lattice.core.ControllableReporter;
 import mon.lattice.core.DataConsumerInteracter;
-import mon.lattice.core.DataSource;
-import mon.lattice.core.ID;
-import mon.lattice.core.Probe;
-import mon.lattice.core.ProbeAttribute;
 import mon.lattice.core.Reporter;
 
 import java.io.IOException;
 import mon.lattice.core.ControllableDataConsumer;
+import mon.lattice.core.DataSource;
 import mon.lattice.core.EntityType;
+import mon.lattice.core.Probe;
+import mon.lattice.core.ProbeAttribute;
 import mon.lattice.core.plane.AnnounceMessage;
 import mon.lattice.core.plane.DeannounceMessage;
+import mon.lattice.control.agents.ControllerAgent;
 
 /**
  * A TomP2PDHTDataConsumerInfoPlane is an InfoPlane implementation
  that sends the Information Model data.
  */
 
-public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane implements DataConsumerInteracter {
+public abstract class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane implements DataConsumerInteracter {
     protected ControllableDataConsumer dataConsumer;
 
     /**
      * Announce that the plane is up and running
      */
+    @Override
     public boolean announce() {
 	addDataConsumerInfo(dataConsumer);
         return true;
@@ -38,6 +39,7 @@ public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane imple
     /**
      * Un-sendMessage that the plane is up and running
      */
+    @Override
     public boolean dennounce() {
         try {
 	    imNode.removeDataConsumer(dataConsumer);
@@ -49,6 +51,19 @@ public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane imple
 	    return false;
 	}        
     }
+    
+    
+    @Override
+    public ControllableDataConsumer getDataConsumer() {
+        return this.dataConsumer;
+    }
+
+    @Override
+    public ControllableDataConsumer setDataConsumer(ControllableDataConsumer dc) {
+        this.dataConsumer = dc;
+        return dataConsumer;
+    }
+    
 
     @Override
     public boolean addDataConsumerInfo(ControllableDataConsumer dc) {
@@ -97,17 +112,11 @@ public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane imple
 	}
     }
     
-    /* maybe we should consider refactoring the interface InfoService
-       the below method cannot be executed by a Data Consumer
-    */
-
+    
+    /* A Data Consumer cannot modify any Data Source related info plane items */
+    
     @Override
     public boolean addDataSourceInfo(DataSource ds) {
-        return false;
-    }
-
-    @Override
-    public boolean addProbeInfo(Probe p) {
         return false;
     }
 
@@ -117,12 +126,12 @@ public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane imple
     }
 
     @Override
-    public boolean modifyDataSourceInfo(DataSource ds) {
+    public boolean addProbeInfo(Probe p) {
         return false;
     }
 
     @Override
-    public boolean modifyProbeInfo(Probe p) {
+    public boolean modifyDataSourceInfo(DataSource ds) {
         return false;
     }
 
@@ -132,12 +141,12 @@ public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane imple
     }
 
     @Override
-    public boolean removeDataSourceInfo(DataSource ds) {
+    public boolean modifyProbeInfo(Probe p) {
         return false;
     }
 
     @Override
-    public boolean removeProbeInfo(Probe p) {
+    public boolean removeDataSourceInfo(DataSource ds) {
         return false;
     }
 
@@ -147,28 +156,20 @@ public class AbstractDHTDataConsumerInfoPlane extends AbstractDHTInfoPlane imple
     }
 
     @Override
-    public boolean containsDataSource(ID dataSourceID, int timeOut) {
-        throw new UnsupportedOperationException("Not supported on a Data Consumer"); 
+    public boolean removeProbeInfo(Probe p) {
+        return false;
+    }
+    
+
+    /* A Data Consumer cannot modify any Controller Agent related info plane items */
+    
+    @Override
+    public boolean addControllerAgentInfo(ControllerAgent agent) {
+        return false;
     }
 
     @Override
-    public boolean containsDataConsumer(ID dataConsumerID, int timeOut) {
-        throw new UnsupportedOperationException("Not supported on a Data Consumer");
-    } 
-
-    @Override
-    public ControllableDataConsumer getDataConsumer() {
-        return this.dataConsumer;
-    }
-
-    @Override
-    public ControllableDataConsumer setDataConsumer(ControllableDataConsumer dc) {
-        this.dataConsumer = dc;
-        return dataConsumer;
-    }
-
-    @Override
-    public Object lookupProbesOnDS(ID dataSourceID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean removeControllerAgentInfo(ControllerAgent agent) {
+        return false;
     }
 }

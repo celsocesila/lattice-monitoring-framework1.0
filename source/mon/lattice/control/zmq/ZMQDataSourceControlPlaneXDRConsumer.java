@@ -32,6 +32,7 @@ public class ZMQDataSourceControlPlaneXDRConsumer extends AbstractZMQControlPlan
     }
     
     
+    @Override
     public boolean connect() {
 	try {
 	    // only connect if we're not already connected

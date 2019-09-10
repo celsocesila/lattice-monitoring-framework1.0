@@ -18,9 +18,13 @@ import us.monoid.web.Resty;
 
 import static us.monoid.web.Resty.delete;
 import static us.monoid.web.Resty.put;
+import eu.fivegex.monitoring.control.probescatalogue.JSONProbesCatalogue;
 import static us.monoid.web.Resty.content;
 import static us.monoid.web.Resty.form;
-import eu.fivegex.monitoring.control.probescatalogue.JSONProbesCatalogue;
+import static us.monoid.web.Resty.content;
+import static us.monoid.web.Resty.form;
+import static us.monoid.web.Resty.content;
+import static us.monoid.web.Resty.form;
 import static us.monoid.web.Resty.content;
 import static us.monoid.web.Resty.form;
 
@@ -644,6 +648,16 @@ public class LatticeControllerClient implements ControlInterface<JSONObject>, De
 
     @Override
     public void initCatalogue() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JSONObject startControllerAgent(String endPoint, String port, String userName, String className, String args) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JSONObject stopControllerAgent(String mmID) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

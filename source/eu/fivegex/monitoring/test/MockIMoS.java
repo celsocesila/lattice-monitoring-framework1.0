@@ -6,7 +6,6 @@
 package eu.fivegex.monitoring.test;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -14,21 +13,6 @@ import us.monoid.json.JSONArray;
 import us.monoid.json.JSONException;
 import us.monoid.json.JSONObject;
 import us.monoid.web.Resty;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
-import static us.monoid.web.Resty.content;
 import static us.monoid.web.Resty.content;
 
 /**

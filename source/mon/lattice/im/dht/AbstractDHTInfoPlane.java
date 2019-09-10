@@ -5,11 +5,11 @@
 
 package mon.lattice.im.dht;
 
-import mon.lattice.core.DataSource;
-import mon.lattice.core.Probe;
-import mon.lattice.core.ID;
-import mon.lattice.core.plane.InfoPlane;
 import java.io.Serializable;
+import mon.lattice.core.DataSource;
+import mon.lattice.core.ID;
+import mon.lattice.core.Probe;
+import mon.lattice.core.plane.InfoPlane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * It is also a DataSourceInteracter so it can, if needed,
  * talk to the DataSource object it gets bound to.
  */
-public abstract class AbstractDHTInfoPlane implements InfoPlane  {
+public abstract class AbstractDHTInfoPlane implements InfoPlane {
     protected AbstractDHTIMNode imNode;
     
     static protected Logger LOGGER = LoggerFactory.getLogger(AbstractDHTInfoPlane.class);
@@ -47,40 +47,57 @@ public abstract class AbstractDHTInfoPlane implements InfoPlane  {
     public String getInfoRootHostname() {
         return imNode.getRemoteHostname();
     }
-
     
     
-    // lookup some info in the InfoPlane
+    
+    @Override
+    public boolean putInfo(String key, Serializable value) {
+	return imNode.putDHT(key, value);
+    }
+    
+    @Override
+    public boolean removeInfo(String key) {
+	return imNode.remDHT(key);
+    }
+    
+    @Override
+    public Object getInfo(String key) {
+	return imNode.getDHT(key);
+    }
+    
+    
+    /* Common Consumer Info Service methods */
+    
     @Override
     public Object lookupDataSourceInfo(DataSource dataSource, String info) {
 	return imNode.getDataSourceInfo(dataSource.getID(), info);
     }
 
-    // lookup some info in the InfoPlane
     @Override
     public Object lookupDataSourceInfo(ID dataSourceID, String info) {
 	return imNode.getDataSourceInfo(dataSourceID, info);
     }
 
-    // lookup some info in the InfoPlane
+    @Override
+    public Object lookupControllerAgentInfo(ID controllerAgentID, String info) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     @Override
     public Object lookupProbeInfo(Probe probe, String info) {
 	return imNode.getProbeInfo(probe.getID(), info);
     }
 
-    // lookup some info in the InfoPlane
     @Override
     public Object lookupProbeInfo(ID probeID, String info) {
 	return imNode.getProbeInfo(probeID, info);
     }
 
-    // lookup some info in the InfoPlane
     @Override
     public Object lookupProbeAttributeInfo(Probe probe, int field, String info) {
 	return imNode.getProbeAttributeInfo(probe.getID(), field, info);
     }
 
-    // lookup some info in the InfoPlane
     @Override
     public Object lookupProbeAttributeInfo(ID probeID, int field, String info) {
 	return imNode.getProbeAttributeInfo(probeID, field, info);
@@ -96,35 +113,31 @@ public abstract class AbstractDHTInfoPlane implements InfoPlane  {
         return imNode.getReporterInfo(reporterID, info);
     }
     
-
-    /**
-     * Put a value in the InfoPlane.
-     */
     @Override
-    public boolean putInfo(String key, Serializable value) {
-	return imNode.putDHT(key, value);
+    public Object lookupProbesOnDataSource(ID dataSourceID) {
+        return imNode.getProbesOnDataSource(dataSourceID);
+    }
+    
+    @Override
+    public boolean containsDataSource(ID dataSourceID, int timeOut) {
+        return imNode.containsDataSource(dataSourceID, timeOut);
     }
 
-    /**
-     * Get a value from the InfoPlane.
-     */
     @Override
-    public Object getInfo(String key) {
-	return imNode.getDHT(key);
+    public boolean containsDataConsumer(ID dataConsumerID, int timeOut) {
+        return imNode.containsDataConsumer(dataConsumerID, timeOut);
     }
 
-    /**
-     * Remove a value from the InfoPlane.
-     */
     @Override
-    public boolean removeInfo(String key) {
-	return imNode.remDHT(key);
+    public boolean containsControllerAgent(ID controllerAgentID, int timeOut) {
+        return imNode.containsControllerAgent(controllerAgentID, timeOut);
     }
+    
+    
     
     @Override
     public String toString() {
         return imNode.toString();
     }
-
     
 }

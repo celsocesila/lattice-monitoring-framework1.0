@@ -21,6 +21,8 @@ public interface IMSubscriberNode extends IMBasicNode {
     public Object getProbeInfo(ID probeID, String info);
 
     public Object getProbeAttributeInfo(ID probeID, Integer field, String info);
+    
+    public Object getProbesOnDataSource(ID dsID);
 
     public Object getDataConsumerInfo(ID dcID, String info);
 
@@ -30,5 +32,6 @@ public interface IMSubscriberNode extends IMBasicNode {
     
     public boolean containsDataConsumer(ID dataConsumerID, int timeout);
     
+    public boolean containsControllerAgent(ID controllerAgentID, int timeout);
     
 }

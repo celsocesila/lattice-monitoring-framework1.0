@@ -18,5 +18,9 @@ public interface DeploymentInterface<ReturnType> {
     
     ReturnType stopDataConsumer(String dcID) throws Exception;
     
+    ReturnType startControllerAgent(String endPoint, String port, String userName, String className, String args) throws Exception;
+    
+    ReturnType stopControllerAgent(String caID) throws Exception;
+    
     public void initDeployment();
 }

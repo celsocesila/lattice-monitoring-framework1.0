@@ -9,18 +9,19 @@ import mon.lattice.core.ID;
 import mon.lattice.core.plane.InfoPlane;
 import java.util.HashMap;
 import java.util.Map;
+import mon.lattice.core.plane.ConsumerInfoPlane;
 
 /**
  *
  * @author uceeftu
  */
 public class ReporterInformationManager {
-    private final InfoPlane info;
+    private final ConsumerInfoPlane info;
     private final Map<ID,String> probesCache;
     private final Map<ID,String> probeAttributesCache;
     
     public ReporterInformationManager(InfoPlane info) {
-        this.info = info;
+        this.info = (ConsumerInfoPlane)info;
         probesCache = new HashMap<>();
         probeAttributesCache = new HashMap<>();
     }

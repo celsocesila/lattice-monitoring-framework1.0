@@ -473,7 +473,7 @@ public class TomP2PIMNode extends AbstractDHTIMNode implements AnnounceEventList
             return dht.contains(newKey, timeout);
         } 
         catch (IOException ioe) {
-            LOGGER.error("ContainsDataSource failed for DS " + dataSourceID + ioe.getMessage());
+            LOGGER.error("ContainsDataSource failed for DS " + dataSourceID + " " + ioe.getMessage());
             return false;
         }
     }
@@ -485,11 +485,22 @@ public class TomP2PIMNode extends AbstractDHTIMNode implements AnnounceEventList
             return dht.contains(newKey, timeout);
         } 
         catch (IOException ioe) {
-            LOGGER.error("ContainsDataConsumer failed for DS " + dataConsumerID + ioe.getMessage());
+            LOGGER.error("ContainsDataConsumer failed for DS " + dataConsumerID + " " + ioe.getMessage());
             return false;
         }
     }
-    
+
+    @Override
+    public boolean containsControllerAgent(ID controllerAgentID, int timeout) {
+        try {
+            String newKey = "/controlleragent/" + controllerAgentID + "/name";
+            return dht.contains(newKey, timeout);
+        } 
+        catch (IOException ioe) {
+            LOGGER.error("IMNode: containsControllerAgent failed for agent " + controllerAgentID + " " + ioe.getMessage());
+            return false;
+        }     
+    }
 
     /**
      * Put stuff into DHT.

@@ -30,6 +30,11 @@ public abstract class AbstractZMQInfoPlane implements InfoPlane  {
     public boolean containsDataConsumer(ID dataConsumerID, int timeout) {
         return zmqSubscriber.containsDataConsumer(dataConsumerID, timeout);
     }
+
+    @Override
+    public boolean containsControllerAgent(ID controllerAgentID, int timeout) {
+        return zmqSubscriber.containsControllerAgent(controllerAgentID, timeout);
+    }
     
     @Override
     public Object lookupDataSourceInfo(DataSource dataSource, String info) {
@@ -65,6 +70,11 @@ public abstract class AbstractZMQInfoPlane implements InfoPlane  {
     public Object lookupDataConsumerInfo(ID dataConsumerID, String info) {
         return zmqSubscriber.getDataConsumerInfo(dataConsumerID, info);
     }
+    
+    @Override
+    public Object lookupControllerAgentInfo(ID controllerAgentID, String info) {
+        return zmqSubscriber.getControllerAgentInfo(controllerAgentID, info);
+    }
 
     @Override
     public Object lookupReporterInfo(ID reporterID, String info) {
@@ -72,8 +82,8 @@ public abstract class AbstractZMQInfoPlane implements InfoPlane  {
     }
     
     @Override
-    public Object lookupProbesOnDS(ID dataSourceID) {
-        return zmqSubscriber.getProbesOnDS(dataSourceID);
+    public Object lookupProbesOnDataSource(ID dataSourceID) {
+        return zmqSubscriber.getProbesOnDataSource(dataSourceID);
     }
     
     @Override

@@ -255,10 +255,11 @@ public class VLSPDataCollector {
                 
                 localController = new JSONObject();
                 
-                localController.put("id", local+1);
+                //localController.put("id", local+1);
                 
                 JSONObject hostinfo = hostDetail.getJSONObject(local).getJSONObject("hostinfo");
 
+                localController.put("hostName", hostinfo.get("name"));
             
                 // CPU
                 localController.put("cpuLoad", hostinfo.getDouble("cpuLoad") * 100);

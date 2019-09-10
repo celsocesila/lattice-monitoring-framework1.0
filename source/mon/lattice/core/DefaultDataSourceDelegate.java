@@ -5,13 +5,15 @@
 
 package mon.lattice.core;
 
-import mon.lattice.core.plane.InfoPlane;
 import mon.lattice.core.plane.ControlPlane;
 import mon.lattice.core.plane.DataPlaneMessage;
 import mon.lattice.core.plane.DataPlane;
 import mon.lattice.control.ProbeLoader;
 import mon.lattice.control.ProbeLoaderException;
 import java.io.Serializable;
+import mon.lattice.core.plane.ProducerInfoPlane;
+import mon.lattice.control.agents.ControllerAgent;
+import mon.lattice.core.plane.InfoPlane;
 
 /**
  * A DataSourceDelegate is a delegate for a DataSource
@@ -27,13 +29,14 @@ public class DefaultDataSourceDelegate extends AbstractPlaneInteracter implement
      */
     DataSource dataSource;
 
+    //ProducerInfoPlane producerInfoPlane;
+    
     /**
      * Construct a DataSourceDelegate.
      */
     public DefaultDataSourceDelegate(DataSource ds) {
 	dataSource = ds;
     }
-
 
     /**
      * Get the DataSource this is a delegate for.
@@ -111,6 +114,7 @@ public class DefaultDataSourceDelegate extends AbstractPlaneInteracter implement
     public PlaneInteracter setInfoPlane(InfoPlane infoPlane) {
 	// set infoPlane
 	this.infoPlane = infoPlane;
+        //this.producerInfoPlane = infoPlane;
 
 
 	if (infoPlane != null) {
@@ -122,6 +126,13 @@ public class DefaultDataSourceDelegate extends AbstractPlaneInteracter implement
 
 	return this;
     }
+    
+    
+    @Override
+    public InfoPlane getInfoPlane() {
+        return this.infoPlane;
+    }
+    
 
     /*
      * Data Service
@@ -158,73 +169,73 @@ public class DefaultDataSourceDelegate extends AbstractPlaneInteracter implement
     /**
      * Lookup some DataSource info in the InfoPlane.
      */
-    public Object lookupDataSourceInfo(DataSource dataSource, String info) {
-	if (infoPlane != null) {
-	    return infoPlane.lookupDataSourceInfo(dataSource, info);
-	} else {
-	    return null;
-	}
-    }
-
-    /**
-     * Lookup some DataSource info in the InfoPlane.
-     * Mostly used at the management end, as it uses DataSource ID.
-     */
-    public Object lookupDataSourceInfo(ID dataSourceID, String info) {
-	if (infoPlane != null) {
-	    return infoPlane.lookupDataSourceInfo(dataSourceID, info);
-	} else {
-	    return null;
-	}
-    }
-
-    /**
-     * Lookup some Probe info in the InfoPlane.
-     */
-    public Object lookupProbeInfo(Probe probe, String info) {
-	if (infoPlane != null) {
-	    return infoPlane.lookupProbeInfo(probe, info);
-	} else {
-	    return null;
-	}
-    }
-
-    /**
-     * Lookup some Probe info in the InfoPlane.
-     * Mostly used at the management end, as it uses Probe ID.
-     */
-    public Object lookupProbeInfo(ID probeID, String info) {
-	if (infoPlane != null) {
-	    return infoPlane.lookupProbeInfo(probeID, info);
-	} else {
-	    return null;
-	}
-    }
-
-
-    /**
-     * Lookup some ProbeAttribute info in the InfoPlane.
-     */
-    public Object lookupProbeAttributeInfo(Probe probe, int field, String info) {
-	if (infoPlane != null) {
-	    return infoPlane.lookupProbeAttributeInfo(probe, field, info);
-	} else {
-	    return null;
-	}
-    }
-
-
-    /**
-     * Lookup some ProbeAttribute info in the InfoPlane.
-     * Mostly used at the management end, as it uses Probe ID.
-     */
-    public Object lookupProbeAttributeInfo(ID probeID, int field, String info) {
-	if (infoPlane != null) {
-	    return infoPlane.lookupProbeAttributeInfo(probeID, field, info);
-	} else {
-	    return null;
-	}
-    }
+//    public Object lookupDataSourceInfo(DataSource dataSource, String info) {
+//	if (infoPlane != null) {
+//	    return producerInfoPlane.lookupDataSourceInfo(dataSource, info);
+//	} else {
+//	    return null;
+//	}
+//    }
+//
+//    /**
+//     * Lookup some DataSource info in the InfoPlane.
+//     * Mostly used at the management end, as it uses DataSource ID.
+//     */
+//    public Object lookupDataSourceInfo(ID dataSourceID, String info) {
+//	if (infoPlane != null) {
+//	    return producerInfoPlane.lookupDataSourceInfo(dataSourceID, info);
+//	} else {
+//	    return null;
+//	}
+//    }
+//
+//    /**
+//     * Lookup some Probe info in the InfoPlane.
+//     */
+//    public Object lookupProbeInfo(Probe probe, String info) {
+//	if (infoPlane != null) {
+//	    return producerInfoPlane.lookupProbeInfo(probe, info);
+//	} else {
+//	    return null;
+//	}
+//    }
+//
+//    /**
+//     * Lookup some Probe info in the InfoPlane.
+//     * Mostly used at the management end, as it uses Probe ID.
+//     */
+//    public Object lookupProbeInfo(ID probeID, String info) {
+//	if (infoPlane != null) {
+//	    return producerInfoPlane.lookupProbeInfo(probeID, info);
+//	} else {
+//	    return null;
+//	}
+//    }
+//
+//
+//    /**
+//     * Lookup some ProbeAttribute info in the InfoPlane.
+//     */
+//    public Object lookupProbeAttributeInfo(Probe probe, int field, String info) {
+//	if (infoPlane != null) {
+//	    return producerInfoPlane.lookupProbeAttributeInfo(probe, field, info);
+//	} else {
+//	    return null;
+//	}
+//    }
+//
+//
+//    /**
+//     * Lookup some ProbeAttribute info in the InfoPlane.
+//     * Mostly used at the management end, as it uses Probe ID.
+//     */
+//    public Object lookupProbeAttributeInfo(ID probeID, int field, String info) {
+//	if (infoPlane != null) {
+//	    return producerInfoPlane.lookupProbeAttributeInfo(probeID, field, info);
+//	} else {
+//	    return null;
+//	}
+//    }
 
     // Add things
 
@@ -498,7 +509,7 @@ public class DefaultDataSourceDelegate extends AbstractPlaneInteracter implement
 
     /**
      * Has this probe been activated.
-     * Is the thread associated with a Probe acutally running. 
+     * Is the thread associated with a Probe actually running. 
      */
     public boolean isProbeActive(ID probeID) {
 	return dataSource.isProbeActive(probeID);
@@ -542,51 +553,38 @@ public class DefaultDataSourceDelegate extends AbstractPlaneInteracter implement
         dataSource.removeProbe(p);
         return true;
     }
+
+    /* Data Source should never modify Data Consumer related info */
     
     @Override
-    public Object lookupDataConsumerInfo(ID dataConsumerID, String info) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public boolean addDataConsumerInfo(ControllableDataConsumer dc) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
+        return false;
     }
 
     @Override
     public boolean addReporterInfo(Reporter r) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
+        return false;        
     }
 
     @Override
     public boolean removeDataConsumerInfo(ControllableDataConsumer dc) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
+        return false;
     }
 
     @Override
     public boolean removeReporterInfo(Reporter r) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
+        return false;
     }
 
-    @Override
-    public Object lookupReporterInfo(ID reporterID, String info) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean containsDataSource(ID dataSourceID, int timeOut) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean containsDataConsumer(ID dataConsumerID, int timeOut) {
-        throw new UnsupportedOperationException("Not supported on a Data Source"); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Object lookupProbesOnDS(ID dataSourceID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    /* Data Source should never modify Controller Agent related info */
     
-    
+    @Override
+    public boolean addControllerAgentInfo(ControllerAgent agent) {
+        return false;
+    }
+
+    @Override
+    public boolean removeControllerAgentInfo(ControllerAgent agent) {
+        return false;
+    }
 }

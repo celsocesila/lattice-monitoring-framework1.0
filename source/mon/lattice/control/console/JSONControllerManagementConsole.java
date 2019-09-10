@@ -31,6 +31,9 @@ public final class JSONControllerManagementConsole extends RestConsole{
         // /dataconsumer/uuid/?<args> 
         defineRequestHandler("/dataconsumer/.*", new DataConsumerRestHandler());
         
+        
+        defineRequestHandler("/controlleragent/.*", new ControllerAgentRestHandler());
+        
         // /dataconsumer/uuid/?<args> 
         defineRequestHandler("/reporter/.*", new ReporterRestHandler());
         

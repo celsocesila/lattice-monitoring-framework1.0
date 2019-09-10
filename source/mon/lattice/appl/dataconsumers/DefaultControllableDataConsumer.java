@@ -161,8 +161,7 @@ public final class DefaultControllableDataConsumer extends AbstractDataConsumer 
     public void removeReporter(ControllableReporter l) {
         super.removeReporter(l);
         reporters.remove(l.getId());
-        if (this.getInfoPlane() != null)
-            this.getInfoPlane().removeReporterInfo(l);
+        getInfoPlane().removeReporterInfo(l);
         
     }
 
@@ -178,8 +177,7 @@ public final class DefaultControllableDataConsumer extends AbstractDataConsumer 
         
         super.addReporter(l);
         reporters.put(l.getId(), l);
-        if (this.getInfoPlane() != null)
-            this.getInfoPlane().addReporterInfo(l);
+        getInfoPlane().addReporterInfo(l);
     }
 
     @Override

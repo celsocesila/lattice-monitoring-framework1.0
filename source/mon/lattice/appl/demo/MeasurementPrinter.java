@@ -8,9 +8,8 @@ package mon.lattice.appl.demo;
 import mon.lattice.core.ProbeValue;
 import mon.lattice.core.Measurement;
 import mon.lattice.core.Reporter;
-import mon.lattice.core.plane.InfoPlane;
-
 import java.util.List;
+import mon.lattice.core.plane.InfoPlane;
 
 /**
  * A class that prints Measurements.

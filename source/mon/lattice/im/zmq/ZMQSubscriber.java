@@ -43,6 +43,8 @@ public class ZMQSubscriber extends AbstractIMNode implements IMSubscriberNode, R
     Map<ID, JSONObject> dataConsumers = new HashMap<>();
     Map<ID, JSONObject> reporters = new HashMap<>();
     
+    Map<ID, JSONObject> controllerAgents = new HashMap<>();
+    
     AnnounceEventListener listener;
     
     Thread thread = new Thread(this, "zmq-info-subscriber");;
@@ -177,6 +179,13 @@ public class ZMQSubscriber extends AbstractIMNode implements IMSubscriberNode, R
         return dataConsumers.containsKey(dataConsumerID);
     }
     
+    
+    @Override
+    public boolean containsControllerAgent(ID controllerAgentID, int timeOut) {
+        return controllerAgents.containsKey(controllerAgentID);
+    }
+    
+    
     @Override
     public Object getDataSourceInfo(ID dataSourceID, String info) {
         try {
@@ -229,6 +238,19 @@ public class ZMQSubscriber extends AbstractIMNode implements IMSubscriberNode, R
         }
     }
     
+    //@Override
+    public Object getControllerAgentInfo(ID controllerAgentID, String info) {
+        try {
+            JSONObject controllerAgent = controllerAgents.get(controllerAgentID);
+            Object controllerAgentInfo = controllerAgent.get(info);
+            return controllerAgentInfo;
+        } catch (JSONException | NullPointerException e) {
+            LOGGER.error("Error while retrieving Controller Agent info '" + info + "': " + e.getMessage());
+            return null;
+        }
+    }
+    
+    
     
     @Override
     public Object getReporterInfo(ID reporterID, String info) {
@@ -243,7 +265,8 @@ public class ZMQSubscriber extends AbstractIMNode implements IMSubscriberNode, R
     }
     
     
-    public Object getProbesOnDS(ID dataSourceID) {
+    @Override
+    public Object getProbesOnDataSource(ID dataSourceID) {
         JSONArray probesOnDS = new JSONArray();
         try {
             for (ID probeID : probes.keySet()) {
@@ -389,7 +412,17 @@ public class ZMQSubscriber extends AbstractIMNode implements IMSubscriberNode, R
                     for (ID id: reporters.keySet())
                         LOGGER.debug(reporters.get(id).toString(1));
                     
-                    break;      
+                    break;   
+                    
+                case "controlleragent":
+                    if (operation.equals("add")) {
+                        controllerAgents.put(entityID, msgObj.getJSONObject("info"));
+                        sendMessage(new AnnounceMessage(entityID, EntityType.CONTROLLERAGENT));
+                    }
+                    else if (operation.equals("remove")) {
+                        controllerAgents.remove(entityID);
+                        sendMessage(new DeannounceMessage(entityID, EntityType.CONTROLLERAGENT));
+                    }
             }
             
             

@@ -11,6 +11,7 @@ import mon.lattice.core.ControllableReporter;
 import mon.lattice.core.DataSource;
 import mon.lattice.core.Probe;
 import mon.lattice.core.ProbeAttribute;
+import mon.lattice.control.agents.ControllerAgent;
 
 /**
  *
@@ -45,7 +46,9 @@ public interface IMPublisherNode extends IMBasicNode {
      */
 
     IMBasicNode addReporter(ControllableReporter r) throws IOException;
-
+    
+    IMBasicNode addControllerAgent(ControllerAgent agent) throws IOException;
+    
     /*
      * Modify stuff
      */
@@ -68,5 +71,6 @@ public interface IMPublisherNode extends IMBasicNode {
 
     IMBasicNode removeReporter(ControllableReporter r) throws IOException;
     
+    IMBasicNode removeControllerAgent(ControllerAgent agent) throws IOException;
     
 }

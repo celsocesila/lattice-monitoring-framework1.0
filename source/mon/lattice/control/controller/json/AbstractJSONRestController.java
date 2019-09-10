@@ -100,11 +100,11 @@ public abstract class AbstractJSONRestController extends AbstractJSONController 
 
         if (this.usingDeploymentManager) {
             try {
-                startedDsID = this.deploymentManager.startDataSourceIfDoesNotExist(new SSHServerEntityInfo(endPoint, Integer.valueOf(port), userName), 
+                startedDsID = this.deploymentManager.startDataSource(new SSHServerEntityInfo(endPoint, Integer.valueOf(port), userName), 
                                                                        new DataSourceInfo(dsClassName, args));
 
                 if (startedDsID == null) {
-                    result.put("msg", "en error occured while starting the Data Ssource on the specified endpoint");
+                    result.put("msg", "en error occured while starting the Data Source on the specified endpoint");
                     result.put("success", false);
                 }
 
@@ -207,6 +207,24 @@ public abstract class AbstractJSONRestController extends AbstractJSONController 
             result.put("success", false);
             result.put("msg", "Deployment Manager is not running");
         }
+        return result;
+    }
+
+    @Override
+    public JSONObject startControllerAgent(String endPoint, String port, String userName, String className, String args) throws Exception {
+        JSONObject result = new JSONObject();
+        result.put("operation", "startControllerAgent");
+        result.put("success", false);
+        result.put("msg", "Not supported by this controller " + this.getClass().getName());
+        return result;
+    }
+
+    @Override
+    public JSONObject stopControllerAgent(String id) throws Exception {
+        JSONObject result = new JSONObject();
+        result.put("operation", "stopControllerAgent");
+        result.put("success", false);
+        result.put("msg", "Not supported by this controller " + this.getClass().getName());
         return result;
     }
     

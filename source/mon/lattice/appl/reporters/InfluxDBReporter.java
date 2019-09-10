@@ -19,7 +19,7 @@ import static us.monoid.web.Resty.form;
 
 /**
  *
- * @author uceeftu
+ * Save the measurements in the InfluxDB database
  */
 public class InfluxDBReporter extends AbstractReporter {
     String serverAddress;
@@ -33,19 +33,20 @@ public class InfluxDBReporter extends AbstractReporter {
     
     
     public InfluxDBReporter(String address, String port, String database) {
-        super("influxDB-reporter");
+        super("InfluxDBReporter");
         this.serverAddress = address;
         this.serverPort = port;
         this.database= database;
         this.influxDBURI = "http://" + serverAddress + ":" + serverPort + "/write?db=" + database + "&precision=ms";
-                
+        
+        LOGGER.info("URI: " + influxDBURI );
         // should check it the DB exists and create it in case        
     }
     
     @Override
     public void report(Measurement m) {
         //should create a buffer and flushing it every N received measurements
-        LOGGER.debug("Received measurement: " + m.toString());
+        LOGGER.info("Received measurement: " + m.toString());
         
         Timestamp timestamp = m.getTimestamp();
         
@@ -68,7 +69,7 @@ public class InfluxDBReporter extends AbstractReporter {
                                 .append("\n");
             }
         
-        LOGGER.debug(formattedMeasurement.toString());
+        LOGGER.info(formattedMeasurement.toString());
         
         try {
             resty.json(influxDBURI, form(formattedMeasurement.toString()));

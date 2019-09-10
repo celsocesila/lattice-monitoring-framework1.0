@@ -6,14 +6,14 @@
 package mon.lattice.control.deployment.ssh;
 
 import mon.lattice.control.deployment.DeploymentException;
-import mon.lattice.control.deployment.MonitorableEntityInfo;
+import mon.lattice.control.deployment.ResourceEntityInfo;
 import java.util.Objects;
 
 /**
  *
  * @author uceeftu
  */
-public class SSHServerEntityInfo extends MonitorableEntityInfo {
+public class SSHServerEntityInfo extends ResourceEntityInfo {
     String username;
     
     

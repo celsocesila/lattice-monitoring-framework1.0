@@ -19,13 +19,19 @@ public interface InfoPlaneDelegateConsumer {
         
     public boolean containsDataConsumer(ID id);
     
+    public boolean containsControllerAgent(ID id);
+    
     public JSONArray getDataSources() throws JSONException;
     
     public JSONArray getDataConsumers() throws JSONException;
     
+    public JSONArray getControllerAgents() throws JSONException;
+    
     public ControlEndPointMetaData getDSAddressFromProbeID(ID probe) throws ProbeNotFoundException, DSNotFoundException, IOException;
     
     public ControlEndPointMetaData getDSAddressFromID(ID dataSource) throws DSNotFoundException, IOException;
+    
+    public ControlEndPointMetaData getControllerAgentAddressFromID(ID controllerAgent) throws ControllerAgentNotFoundException, IOException;
     
     public String getDSIDFromName(String dsName) throws DSNotFoundException;
     
@@ -33,9 +39,11 @@ public interface InfoPlaneDelegateConsumer {
     
     public ControlEndPointMetaData getDCAddressFromReporterID(ID reporter) throws ReporterNotFoundException, DCNotFoundException, IOException;
     
-    public Integer getDSPIDFromID(ID dataSource) throws DSNotFoundException;
+    public int getDSPIDFromID(ID dataSource) throws DSNotFoundException;
     
     public int getDCPIDFromID(ID dataConsumer) throws DCNotFoundException;  
+    
+    public int getControllerAgentPIDFromID(ID controllerAgent) throws ControllerAgentNotFoundException;
     
     public JSONArray getProbesOnDS(ID dataSource) throws DSNotFoundException; 
 }

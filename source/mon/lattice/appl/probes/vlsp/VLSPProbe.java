@@ -41,12 +41,15 @@ public class VLSPProbe extends AbstractProbe implements Probe {
     TableHeader localControllers;
     TableHeader routers;
     
+    Long partID;
+    
     private Logger LOGGER = LoggerFactory.getLogger(VLSPProbe.class);
     
     
-    public VLSPProbe(String VLSPHost, String VLSPPort, String probeName)  {
+    public VLSPProbe(String VLSPHost, String VLSPPort, String probeName, String partID)  {
         setName(probeName);
         setDataRate(new EveryNSeconds(10));
+        this.partID = Long.valueOf(partID);
         
         try {
             vlspDc = new VLSPDataCollector(VLSPHost, Integer.valueOf(VLSPPort));
@@ -55,7 +58,9 @@ public class VLSPProbe extends AbstractProbe implements Probe {
         }
         
         localControllers = new DefaultTableHeader()
-                                .add("id", ProbeAttributeType.STRING)
+                                // should add another field with slice part ID
+                                .add("partID", ProbeAttributeType.LONG)
+                                .add("hostname", ProbeAttributeType.STRING)
                                 .add("cpuLoad", ProbeAttributeType.FLOAT)
                                 .add("cpuIdle", ProbeAttributeType.FLOAT)
                                 .add("usedMemory", ProbeAttributeType.FLOAT)
@@ -117,7 +122,8 @@ public class VLSPProbe extends AbstractProbe implements Probe {
                 }                        
                         
                 localControllersTable.addRow(new DefaultTableRow()
-                                             .add(new DefaultTableValue(localController.getString("id")))
+                                             .add(new DefaultTableValue(partID))
+                                             .add(new DefaultTableValue(localController.getString("hostName")))
                                              .add(new DefaultTableValue((float)localController.getDouble("cpuLoad")))
                                              .add(new DefaultTableValue((float)localController.getDouble("cpuIdle")))
                                              .add(new DefaultTableValue((float)localController.getDouble("usedMemory")))
@@ -154,7 +160,7 @@ public class VLSPProbe extends AbstractProbe implements Probe {
     
     
     public static void main(String[] args) {
-        VLSPProbe p = new VLSPProbe("localhost", "8888", "testProbe");
+        VLSPProbe p = new VLSPProbe("localhost", "8888", "testProbe", "testPartID");
         p.activateProbe();
         p.collect();
     }

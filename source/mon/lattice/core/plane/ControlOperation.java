@@ -28,7 +28,10 @@ public enum ControlOperation {
     // DC control service 
     GET_DC_RATE("getDCMeasurementsRate"),
     LOAD_REPORTER("loadReporter"),
-    UNLOAD_REPORTER("unloadReporter");
+    UNLOAD_REPORTER("unloadReporter"),
+    
+    // Controller Agents related service
+    SET_MONITORING_ENDPOINT("setMonitoringReportingEndpoint");
     
     private static final HashMap<String, ControlOperation> lookup = new HashMap<>();
 

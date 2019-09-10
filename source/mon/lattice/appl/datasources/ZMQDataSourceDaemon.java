@@ -1,28 +1,26 @@
 package mon.lattice.appl.datasources;
 
+import mon.lattice.appl.Daemon;
 import mon.lattice.core.DefaultControllableDataSource;
 import mon.lattice.control.zmq.ZMQDataSourceControlPlaneXDRConsumer;
 import mon.lattice.distribution.zmq.ZMQDataPlaneProducer;
 import mon.lattice.core.ControllableDataSource;
 import mon.lattice.core.ID;
 import mon.lattice.im.zmq.ZMQDataSourceInfoPlane;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This DataSource in a basic control point for probes that uses a Control Plane and an Info Plane and 
  * logs out/err to a file rather than standard streams.
  **/
-public class ZMQDataSourceDaemon extends Thread {
+
+public class ZMQDataSourceDaemon extends Daemon {
     protected ControllableDataSource dataSource;
     
-    ID dataSourceID;
     String dataSourceName;
     
     InetSocketAddress dataConsumerPair;
@@ -30,11 +28,7 @@ public class ZMQDataSourceDaemon extends Thread {
     InetSocketAddress remoteCtrlPair;
     
     String remoteInfoHost;
-    //int localInfoPort;
     int remoteInfoPort;
-    
-    private static Logger LOGGER;
-    
     
     /**
      * Construct a ZMQDataSourceDaemon with no pre-loaded probes running as a daemon 
@@ -61,7 +55,7 @@ public class ZMQDataSourceDaemon extends Thread {
                            ) throws UnknownHostException {
     
     
-        this.dataSourceID = ID.fromString(myID);
+        this.entityID = myID;
         this.dataSourceName = myDSName;
         
         this.dataConsumerPair = new InetSocketAddress(InetAddress.getByName(dataConsumerName), dataConsumerPort);
@@ -73,11 +67,15 @@ public class ZMQDataSourceDaemon extends Thread {
      
 
 
+    @Override
     public void init() throws IOException {
-        attachShutDownHook();
-        setLogger();
+        entityType = "data-source-";
+        classMetadata = ZMQDataSourceDaemon.class;
         
-	dataSource = new DefaultControllableDataSource(dataSourceName, dataSourceID);
+        attachShutDownHook();
+        initLogger();
+        
+	dataSource = new DefaultControllableDataSource(dataSourceName, ID.fromString(entityID));
         
         LOGGER.info("Data Source ID: " + dataSource.getID());
         LOGGER.info("Process ID: " + dataSource.getMyPID());
@@ -91,7 +89,7 @@ public class ZMQDataSourceDaemon extends Thread {
         // ZMQ Info Plane
         dataSource.setInfoPlane(new ZMQDataSourceInfoPlane(remoteInfoHost, remoteInfoPort));
             
-        // ZMQ Control Plane    
+        // ZMQ Control Plane   
         dataSource.setControlPlane(new ZMQDataSourceControlPlaneXDRConsumer(ctrlPair));
         
 	if (!dataSource.connect()) {
@@ -100,31 +98,6 @@ public class ZMQDataSourceDaemon extends Thread {
         }
         
         LOGGER.info("Connected to the Info Plane using: " + dataSource.getInfoPlane().getInfoRootHostname() + ":" + remoteInfoPort);
-    }
-    
-    
-    void setLogger() throws IOException {
-        String logFileName = "data-source-" + dataSourceID + ".log";
-        File logFile;
-        
-        logFile = new File("/tmp/" + logFileName);
-        
-        if (!logFile.exists()) {
-	    logFile.createNewFile();
-	}
-        
-        if (!logFile.canWrite()) {
-            logFile = new File(System.getProperty("user.home") + "/" + logFileName);
-            if (!logFile.exists())
-               logFile.createNewFile(); 
-        }
-        
-        System.setProperty(org.slf4j.impl.SimpleLogger.LOG_FILE_KEY, logFile.getCanonicalPath());
-        System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_SHORT_LOG_NAME_KEY, "true");
-        System.setProperty(org.slf4j.impl.SimpleLogger.SHOW_THREAD_NAME_KEY, "false");
-        //System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "debug");
-        
-        LOGGER = LoggerFactory.getLogger(ZMQDataSourceDaemon.class);
     }
     
     
@@ -137,11 +110,6 @@ public class ZMQDataSourceDaemon extends Thread {
         } catch (Exception e) {
             LOGGER.error("Something went wrong while disconnecting from the planes " + e.getMessage());
           }
-    }
-    
-    
-    public void attachShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(this);
     }
     
     

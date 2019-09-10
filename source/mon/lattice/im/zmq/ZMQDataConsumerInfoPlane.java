@@ -9,6 +9,7 @@ import java.io.IOException;
 import mon.lattice.core.ControllableDataConsumer;
 import mon.lattice.core.ControllableReporter;
 import mon.lattice.core.DataConsumerInteracter;
+import mon.lattice.control.agents.ControllerAgent;
 
 /**
  * A ZMQDataSourceInfoPlane is an InfoPlane implementation
@@ -157,6 +158,12 @@ public class ZMQDataConsumerInfoPlane extends AbstractZMQInfoPlane implements In
     public boolean addProbeAttributeInfo(Probe p, ProbeAttribute pa) {
 	return false;
     }
+    
+    
+    @Override
+    public boolean addControllerAgentInfo(ControllerAgent agent) {
+        return false;
+    }
 
     
     @Override
@@ -192,5 +199,10 @@ public class ZMQDataConsumerInfoPlane extends AbstractZMQInfoPlane implements In
     @Override
     public boolean removeProbeAttributeInfo(Probe p, ProbeAttribute pa) {
 	return false;
+    }
+    
+    @Override
+    public boolean removeControllerAgentInfo(ControllerAgent agent) {
+        return false;
     }
 }
