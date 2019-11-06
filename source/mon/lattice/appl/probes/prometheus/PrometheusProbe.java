@@ -55,8 +55,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
     List<String> metricsQuery;
     
     private org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PrometheusProbe.class);
-   
-    
+
         public PrometheusProbe(String host, String port, String probeName, String slicePartId, String sliceId, String dataRate, String[] metrics) {
              
             this.sliceId = sliceId;
@@ -105,11 +104,8 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
             }
          
             addProbeAttribute(new TableProbeAttribute(0, "SlicePart", controllerTable));   
-    
     }
-    
-    
-    
+ 
     public PrometheusProbe(String host, String port, String probeName, String slicePartId, String sliceId, String dataRate, String[] metrics, String namespace) {
         
         this.sliceId = sliceId;
@@ -151,10 +147,8 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
         controllerTable.add("ResourceType", ProbeAttributeType.STRING);
                 
         addProbeAttribute(new TableProbeAttribute(0, "SlicePart", controllerTable));
-
     }
-   
-    
+  
     void QueryConvertion() throws UnsupportedEncodingException{
         
         this.queries = new ArrayList<>();
@@ -191,8 +185,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
         queries_containers.add("sum by(pod_name) (rate(container_network_receive_bytes_total{namespace='" + this.namespace + "'}[5m]))");
         queries_containers.add("TOTAL_BYTES_NET_TX");
         queries_containers.add("sum by(pod_name) (rate(container_network_transmit_bytes_total{namespace='" + this.namespace + "'}[5m]))");
-        
-        
+     
         for (int i = 0; i < this.metrics.size(); ++i){
             if (this.namespace != null){
               
@@ -214,15 +207,13 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
                 
             }
         }
-        
-        
+
         for (int h = 0; h < metricsQuery.size(); ++h){
             LOGGER.info("MetricsQuery: " + metricsQuery.get(h));
         }        
         
     } 
-    
-    
+ 
     public List<String> getInstance() throws IOException, JSONException {
        
         List<String> instance = new ArrayList<>();
@@ -239,8 +230,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
         LOGGER.info("Instance " + instance);
         return instance;
     }
-    
-    
+   
     public List<String> getPod_name() throws IOException, JSONException {
        
         List<String> instance = new ArrayList<>();
@@ -258,8 +248,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
         LOGGER.info("Pod_Name " + instance);
         return instance;
     }
-    
-    
+ 
     public String getHost(String instance) throws IOException, JSONException {
        
         String requestURL = this.URLAddress + "node_uname_info";
@@ -279,8 +268,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
         LOGGER.info("Host Not Found");
         return null;
     }
-    
-    
+
 //    public List<String> getMetrics(String query) throws IOException, JSONException {
 //        
 //        List<String> metricValue = new ArrayList<>();
@@ -301,8 +289,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
 //        return metricValue;
 //    }
     
-    
-    
+
     public String getMetrics(String query, String instance) throws IOException, JSONException {
         
         String requestURL = this.URLAddress + query;           
@@ -324,8 +311,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
         LOGGER.info("Metric Not Found");
         return null;
     }
-    
-    
+        
     public String getMetricsContainer(String query, String pod_name) throws IOException, JSONException {
         
         String requestURL = this.URLAddress + query;           
@@ -350,8 +336,7 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
         LOGGER.info("Metric Not Found");
         return null;
     }
-    
-
+   
     @Override
     public ProbeMeasurement collect(){
         
@@ -406,30 +391,23 @@ public class PrometheusProbe extends AbstractProbe implements Probe {
                                                                        
                         defaultTableRow.add(new DefaultTableValue("Host"));
                         
-                        metricsTable.addRow(defaultTableRow);
-                        
+                        metricsTable.addRow(defaultTableRow);  
                     }
-
                 }    
-                
-                
+               
                 ArrayList<ProbeValue> list = new ArrayList<>(1);
                 
                 list.add(new DefaultProbeValue(0, metricsTable));
-                
-                
                 
                 ProbeMeasurement m = new ProducerMeasurement(this, list, "Table");
                 LOGGER.info("TABLE M: " + m); 
                 
                 return m;
                     
-                    
                 } catch (IOException | JSONException | TableException | TypeException ex) {
                     Logger.getLogger(PrometheusProbe.class.getName()).log(Level.SEVERE, null, ex);
                 }
         
         return null;
-    
     }            
 }               

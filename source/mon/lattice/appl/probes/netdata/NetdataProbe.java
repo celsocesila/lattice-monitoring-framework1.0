@@ -97,10 +97,8 @@ public class NetdataProbe extends AbstractProbe implements Probe {
             }
          
             addProbeAttribute(new TableProbeAttribute(0, "SlicePart", controllerTable));    
-    
     }
-    
-    
+
     public NetdataProbe(String host, String port, String probeName, String slicePartId, String sliceId, String dataRate, String[] metrics, String namespace) {
         
         this.namespace = namespace;
@@ -146,10 +144,8 @@ public class NetdataProbe extends AbstractProbe implements Probe {
             }
          
             addProbeAttribute(new TableProbeAttribute(0, "SlicePart", controllerTable));    
-    
     }
-    
-    
+  
     void QueryConvertion(){
         
         this.queries = new ArrayList<>();
@@ -169,8 +165,6 @@ public class NetdataProbe extends AbstractProbe implements Probe {
         queries.add("TOTAL_BYTES_NET_TX");
         queries.add("/api/v1/data?chart=system.net&dimension=sent&after=-1&format=array");
 
-
-        
         for (int i = 0; i < this.metrics.size(); ++i){
             for (int j = 0; j < this.queries.size(); ++j){
                 if (metrics.get(i) == null ? queries.get(j) == null : metrics.get(i).equals(queries.get(j))){
@@ -184,8 +178,7 @@ public class NetdataProbe extends AbstractProbe implements Probe {
         }        
         
     }
-    
-    
+
     public List<String> getInstance() throws IOException, JSONException {
        
         List<String> instance = new ArrayList<>();
@@ -201,13 +194,10 @@ public class NetdataProbe extends AbstractProbe implements Probe {
             instance.add(i,jsresult.getString(i));
             LOGGER.info("Instance " + instance.get(i));
         }
-        
-
-        
+ 
         return instance;
     }
-    
-    
+ 
     public String getMetrics(String query, String internalHost) throws IOException, JSONException {
         
         
@@ -221,8 +211,6 @@ public class NetdataProbe extends AbstractProbe implements Probe {
         LOGGER.info("Metric " + metricValue); 
         return metricValue;
     }
-    
-    
     
     @Override
     public ProbeMeasurement collect() {
@@ -238,7 +226,7 @@ public class NetdataProbe extends AbstractProbe implements Probe {
             
             LOGGER.info("Hosts.size: "+ hosts.size());
             
-            for (int i=0; i < hosts.size(); i++){
+            for (int i=1; i < hosts.size(); i++){
                       
                 DefaultTableRow defaultTableRow = new DefaultTableRow();
                 
@@ -271,8 +259,7 @@ public class NetdataProbe extends AbstractProbe implements Probe {
                 
                 LOGGER.info("TABLE: " + metricsTable); 
             }    
-                
-                
+      
             ArrayList<ProbeValue> list = new ArrayList<>(1);
                 
             list.add(new DefaultProbeValue(0, metricsTable));
